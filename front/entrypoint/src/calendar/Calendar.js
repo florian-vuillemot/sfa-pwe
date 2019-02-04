@@ -13,27 +13,6 @@ class Calendar extends Component {
         this.handleClick = this.handleClick.bind(this);
     }
     
-    handleClick() {
-        const year = parseInt(this.state.year);
-        const monthExist = this.months().find(m => m === this.state.month);
-        
-        if (2010 <= year && year < 2100 && monthExist){
-            this.props.onClick(this.state.year, this.state.month);
-        }
-        else {
-            alert('Date incorrect')
-        }
-    }
-    months() {
-        return ['Janvier', 'Février', 'Mars', 'Avril', 'Mais', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-    }
-
-    getYears() {
-        return [...Array(100)].map((_, i) => i)
-                              .filter(i => i > 9)
-                              .map(i => `20${i}`)
-    }
-    
     render(){
         return (
             <div className="App">
@@ -84,6 +63,22 @@ class Calendar extends Component {
             </div>
         );
     }
+
+    months = () => ['Janvier', 'Février', 'Mars', 'Avril', 'Mais', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+    handleClick() {
+        const year = parseInt(this.state.year);
+        const monthExist = this.months().find(m => m === this.state.month);
+        
+        if (2010 <= year && year < 2100 && monthExist){
+            this.props.onClick(this.state.year, this.state.month);
+        }
+        else {
+            alert('Date incorrect')
+        }
+    }
+
+    getYears = () => [...Array(100)].map((_, i) => i).reduce((acc, i) => i > 9 ? [...acc, `20${i}`] : acc, []);
 }
 
 
