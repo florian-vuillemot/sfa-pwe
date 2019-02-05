@@ -2,10 +2,6 @@
   text-align: center;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-}
 
 .App-header {
   background-color: #282c34;
@@ -22,21 +18,13 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
-.General-info {
+.General-info, .Working-Days {
   width: 80%;
   text-align: left;
 }
 
-.General-info > thead > tr > th:first-child {
+.General-info > thead > tr > th:first-child, .Working-Days > thead > tr > th:first-child {
   width: 300px
 }
 
@@ -61,4 +49,29 @@
 
 .buttonStyle:before {
   content: "\271A";
+}
+
+tbody:before {
+  content: "-";
+  display: block;
+  line-height: 5em;
+  color: transparent;
+}
+
+tbody > tr > th {
+  border-bottom: 1px dashed white;
+}
+
+.Working-Days > thead > tr > th:last-child {
+  text-align: right
+}
+
+.Working-Days > tbody > tr > th, .Working-Days > tbody > tr > td {
+  text-align: center
+}
+
+input {
+  width: 120px;
+  height: 35px;
+  text-align: center
 }
