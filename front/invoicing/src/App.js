@@ -62,9 +62,16 @@ class WorkingDays extends Component {
     super(props);
 
     this.state = {
+      constructionSiteInfo: {
+        client: "Eurovia",
+        place: "Paris"
+      },
+      rate: {
+        hourTaxFreePrice: 90.0,
+        dayPrice: 800.0
+      },
       workingDays: [{
         date: "20/01/2019",
-        client: "Eurovia",
         place: "Paris",
         type: "Transfert",
         taxFreePrice: 80.2,
@@ -72,7 +79,6 @@ class WorkingDays extends Component {
       },
       {
         date: "21/01/2019",
-        client: "Gilbert",
         place: "Paris",
         type: "Chantier",
         taxFreePrice: 60.2,
@@ -110,32 +116,49 @@ function Price(props){
 }
 
 function GlobalInfo(props){
+  const info = props.constructionSiteInfo;
+  const rate = info.rate;
+
   return (
     <thead>
       <tr>
         <th>
-          <label for="client">Client </label>
-          <input name="client" list="clients" />
+          <label forhtml="client">Client </label>
+          <input name="client" list="clients" defaultValue={info.client}/>
+          <datalist id="clients">
+            <option value="Eurovia"/>
+            <option value="Gille"/>
+          </datalist>
         </th>
         <th colSpan="5">
-          <label for="hourTaxFreePrice">Prix horaire HT </label>
-          <input name="hourTaxFreePrice" type="number" step="any"/>
+          <label forhtml="hourTaxFreePrice">Prix horaire HT </label>
+          <input
+            name="hourTaxFreePrice" type="number" step="any" defaultValue={rate.hourTaxFreePrice}
+          />
         </th>
       </tr>
       <tr>
         <th>
-          <label for="place">Lieu </label>
-          <input type="text" name="place" />
+          <label forhtml="place">Lieu </label>
+          <input type="text" name="place" defaultValue={info.place}/>
         </th>
         <th colSpan="5">
-          <label for="dayPrice">Prix journalier HT </label>
-          <input type="number" name="dayPrice" step="any"/>
+          <label forhtml="dayPrice">Prix journalier HT </label>
+          <input
+            type="number" name="dayPrice" step="any" defaultValue={rate.dayPrice}
+          />
         </th>
       </tr>
-      <datalist id="clients">
-        <option value="Eurovia"/>
-        <option value="Gille"/>
-      </datalist>
+      <tr>
+        <th>
+        </th>
+        <th colSpan="6">
+          <label forhtml="taxPercent">TVA (en %) </label>
+          <input
+            type="number" name="taxPercent" step="any" defaultValue={rate.taxPercent}
+          />
+        </th>
+      </tr>
     </thead>
   );
 }
@@ -154,31 +177,31 @@ function TableDay(props){
 }
 
 function DayInfo(props){
-  console.log(props)
+  console.log(props.day)
   const day = props.day ? props.day : {};
   return (
     <tr>
       <td>
-        <input type="date" value={day.date}/>
+        <input type="date" defaultValue={day.date}/>
       </td>
       <td>
-        <select name="type" value={day.type}>
-          <option value="transfert">Transfert</option>
-          <option value="day">Jour complet</option>
-          <option value="hours">Heures travaillé</option>
+        <select name="type" defaultValue={day.type}>
+          <option value="TRANSFER">Transfert</option>
+          <option value="DAY">Jour complet</option>
+          <option value="HOURS">Heures travaillé</option>
         </select>
       </td>
       <td>
-        <input type="number" step="any" value={day.hours}/>
+        {day.type === "HOURS" ? <input type="number" step="any" defaultValue={day.hours}/> : null}
       </td>
       <td>
-        <input type="number" step="any" value={day.taxFreePrice}/>
+        <input type="number" step="any" defaultValue={day.taxFreePrice}/>
       </td>
       <td>
-        <input type="number" step="any" value={day.price}/>
+        <input type="number" step="any" defaultValue={day.price}/>
       </td>
       <td>
-        <i class="fa fa-trash"></i>
+        <i className="fa fa-trash"></i>
       </td>
     </tr>
   );
@@ -191,7 +214,7 @@ function Day(props){
     return len > 0 && daysSorted[len - 1].date ? <DayInfo /> : null;
   };
   const daysSorted = props.days.sort((d1, d2) => d1.date < d2.date);
-  const days = daysSorted.map(d => <DayInfo day={d}/>)
+  const days = daysSorted.map(d => <DayInfo day={d} key={d.date + d.place + d.price}/>)
 
   return (
     <tbody>
@@ -207,33 +230,40 @@ class WorkingDay extends Component{
     super(props);
 
     this.state = {
-
+      data: {
+        constructionSiteInfo: {
+          client: "Eurovia",
+          place: "Paris",
+          rate: {
+            hourTaxFreePrice: 90.0,
+            dayPrice: 800.0,
+            taxPercent: 20
+          }
+        },
+        workingDays: [{
+          date: "2019-03-01",
+          type: "Transfert",
+          taxFreePrice: 80.2,
+          price: 90.5
+        },
+        {
+          date: "2019-03-02",
+          type: "Chantier",
+          taxFreePrice: 60.2,
+          price: 80.5
+        }
+      ]
     }
   }
 
+    
+  }
+
   render() {
-    const days = [
-      {
-        date: "20/01/2019",
-        client: "Eurovia",
-        place: "Paris",
-        type: "Transfert",
-        taxFreePrice: 80.2,
-        price: 90.5
-      },
-      {
-        date: "21/01/2019",
-        client: "Gilbert",
-        place: "Paris",
-        type: "Chantier",
-        taxFreePrice: 60.2,
-        price: 80.5
-      }
-    ];
     return (
       <table className="Working-Days">
-        <GlobalInfo />
-        <Day days={days}/>
+        <GlobalInfo constructionSiteInfo={this.state.data.constructionSiteInfo} />
+        <Day days={this.state.data.workingDays}/>
       </table>
     );
   }
