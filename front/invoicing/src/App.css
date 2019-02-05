@@ -70,8 +70,17 @@ tbody > tr > th {
   text-align: center
 }
 
+.Working-Days > tfoot {
+  text-align: right;
+}
+
 input {
   width: 120px;
   height: 35px;
   text-align: center
+}
+
+i {
+  width: 50px;
+  font-size:36px
 }

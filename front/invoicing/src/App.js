@@ -117,7 +117,7 @@ function GlobalInfo(props){
           <label for="client">Client </label>
           <input name="client" list="clients" />
         </th>
-        <th colSpan="4">
+        <th colSpan="5">
           <label for="hourTaxFreePrice">Prix horaire HT </label>
           <input name="hourTaxFreePrice" type="number" step="any"/>
         </th>
@@ -127,7 +127,7 @@ function GlobalInfo(props){
           <label for="place">Lieu </label>
           <input type="text" name="place" />
         </th>
-        <th colSpan="4">
+        <th colSpan="5">
           <label for="dayPrice">Prix journalier HT </label>
           <input type="number" name="dayPrice" step="any"/>
         </th>
@@ -148,35 +148,56 @@ function TableDay(props){
       <th>Heures</th>
       <th>Prix HT</th>
       <th>Prix TTC</th>
+      <th></th>
+    </tr>
+  );
+}
+
+function DayInfo(props){
+  console.log(props)
+  const day = props.day ? props.day : {};
+  return (
+    <tr>
+      <td>
+        <input type="date" value={day.date}/>
+      </td>
+      <td>
+        <select name="type" value={day.type}>
+          <option value="transfert">Transfert</option>
+          <option value="day">Jour complet</option>
+          <option value="hours">Heures travaillé</option>
+        </select>
+      </td>
+      <td>
+        <input type="number" step="any" value={day.hours}/>
+      </td>
+      <td>
+        <input type="number" step="any" value={day.taxFreePrice}/>
+      </td>
+      <td>
+        <input type="number" step="any" value={day.price}/>
+      </td>
+      <td>
+        <i class="fa fa-trash"></i>
+      </td>
     </tr>
   );
 }
 
 function Day(props){
+  const newDayNeed = (daysSorted) => {
+    const len = daysSorted.length;
+
+    return len > 0 && daysSorted[len - 1].date ? <DayInfo /> : null;
+  };
+  const daysSorted = props.days.sort((d1, d2) => d1.date < d2.date);
+  const days = daysSorted.map(d => <DayInfo day={d}/>)
+
   return (
     <tbody>
       <TableDay />
-      <tr>
-        <td>
-          <input type="date" />
-        </td>
-        <td>
-          <select name="type">
-            <option value="transfert">Transfert</option>
-            <option value="day">Jour complet</option>
-            <option value="hours">Heures travaillé</option>
-          </select>
-        </td>
-        <td>
-          <input type="number" step="any"/>
-        </td>
-        <td>
-          <input type="number" step="any"/>
-        </td>
-        <td>
-          <input type="number" step="any"/>
-        </td>
-      </tr>
+      {days}
+      {newDayNeed(daysSorted)}
     </tbody>
   )
 }
@@ -191,10 +212,28 @@ class WorkingDay extends Component{
   }
 
   render() {
+    const days = [
+      {
+        date: "20/01/2019",
+        client: "Eurovia",
+        place: "Paris",
+        type: "Transfert",
+        taxFreePrice: 80.2,
+        price: 90.5
+      },
+      {
+        date: "21/01/2019",
+        client: "Gilbert",
+        place: "Paris",
+        type: "Chantier",
+        taxFreePrice: 60.2,
+        price: 80.5
+      }
+    ];
     return (
       <table className="Working-Days">
         <GlobalInfo />
-        <Day />
+        <Day days={days}/>
       </table>
     );
   }
