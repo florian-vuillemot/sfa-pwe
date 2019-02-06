@@ -80,7 +80,7 @@ class WorkingDays extends Component {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-function GlobalInfo(props){
+function Info(props){
   const info = props.constructionSiteInfo;
   const rate = info.rate;
 
@@ -119,7 +119,7 @@ function GlobalInfo(props){
   );
 }
 
-function DayInfo(props){
+function Day(props){
   const day = props.day;
   const onDayChange = (event) => props.onDayChange(day, event.target.name, event.target.value);
   const inputNumber = (name) => <input type="number" name={name} step="any" defaultValue={day[name]} onChange={onDayChange}/>;
@@ -164,15 +164,15 @@ function newDay(){
   };
 }
 
-function Day(props){
+function Days(props){
   const daysSorted = props.days.sort((d1, d2) => d1.date ? d1.date < d2.date : true);
-  const days = daysSorted.map(d => <DayInfo day={d} key={d.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/>)
+  const days = daysSorted.map(d => <Day day={d} key={d.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/>)
 
   const newDayNeed = (daysSorted) => {
     const len = daysSorted.length;
     const day = newDay();
     const createDay = len === 0 || !daysSorted.find(d => !d.date);
-    return createDay ? <DayInfo day={day} key={day.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/> : null;
+    return createDay ? <Day day={day} key={day.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/> : null;
   };
 
   return (
@@ -288,12 +288,12 @@ class ConstructionSite extends Component{
   render() {
     return (
       <table className="Working-Days">
-        <GlobalInfo
+        <Info
           clients={this.state.clients}
           constructionSiteInfo={this.state.data.constructionSiteInfo}
           onConstructionSiteChange={this.onConstructionSiteChange}
         />
-        <Day
+        <Days
           days={this.state.data.workingDays}
           onDayChange={this.onDayChange}
           deleteDay={this.deleteDay}
