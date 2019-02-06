@@ -81,6 +81,7 @@ class WorkingDays extends Component {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 function GlobalInfo(props){
+  const onConstructionSiteChange = (e) => props.onConstructionSiteChange(e.target.name, e.target.value);
   const info = props.constructionSiteInfo;
   const rate = info.rate;
 
@@ -89,7 +90,12 @@ function GlobalInfo(props){
       <tr>
         <th>
           <label forhtml="client">Client </label>
-          <input name="client" list="clients" defaultValue={info.client}/>
+          <input
+            name="client"
+            list="clients"
+            defaultValue={info.client}
+            onChange={onConstructionSiteChange}
+          />
           <datalist id="clients">
             <option value="Eurovia"/>
             <option value="Gille"/>
@@ -98,19 +104,32 @@ function GlobalInfo(props){
         <th colSpan="5">
           <label forhtml="hourTaxFreePrice">Prix horaire HT </label>
           <input
-            name="hourTaxFreePrice" type="number" step="any" defaultValue={rate.hourTaxFreePrice}
+            name="hourTaxFreePrice"
+            type="number"
+            step="any"
+            defaultValue={rate.hourTaxFreePrice}
+            onChange={onConstructionSiteChange}
           />
         </th>
       </tr>
       <tr>
         <th>
           <label forhtml="place">Lieu </label>
-          <input type="text" name="place" defaultValue={info.place}/>
+          <input
+            type="text"
+            name="place"
+            defaultValue={info.place}
+            onChange={onConstructionSiteChange}
+          />
         </th>
         <th colSpan="5">
           <label forhtml="dayTaxFreePrice">Prix journalier HT </label>
           <input
-            type="number" name="dayTaxFreePrice" step="any" defaultValue={rate.dayTaxFreePrice}
+            type="number"
+            name="dayTaxFreePrice"
+            step="any"
+            defaultValue={rate.dayTaxFreePrice}
+            onChange={onConstructionSiteChange}
           />
         </th>
       </tr>
@@ -120,7 +139,11 @@ function GlobalInfo(props){
         <th colSpan="6">
           <label forhtml="taxPercent">TVA (en %) </label>
           <input
-            type="number" name="taxPercent" step="any" defaultValue={rate.taxPercent}
+            type="number"
+            name="taxPercent"
+            step="any"
+            defaultValue={rate.taxPercent}
+            onChange={onConstructionSiteChange}
           />
         </th>
       </tr>
@@ -244,6 +267,7 @@ class WorkingDay extends Component{
 
     this.onDayChange = this.onDayChange.bind(this);
     this.deleteDay = this.deleteDay.bind(this);
+    this.onConstructionSiteChange = this.onConstructionSiteChange.bind(this);
   }
 
   taxFreePrice(day, transferTaxFreePrice = null) {
@@ -256,12 +280,16 @@ class WorkingDay extends Component{
       const price = priceTaxFree + priceTaxFree * tax;
       return {...day, taxFreePrice: priceTaxFree / 100, price: price / 100};
     }
-    console.log(transferTaxFreePrice)
-    const dayPrice = (transferTaxFreePrice ? transferTaxFreePrice : data.constructionSiteInfo.rate.dayTaxFreePrice) * 100;
-    const price = dayPrice + dayPrice * tax; 
-    console.log(dayPrice)
-    console.log(price)
-    return {...day, taxFreePrice: dayPrice / 100, price: price / 100};
+    
+    let operationPrice = null;
+    if (day.type === "TRANSFER")
+      operationPrice = transferTaxFreePrice ? transferTaxFreePrice : day.taxFreePrice;
+    else
+      operationPrice = data.constructionSiteInfo.rate.dayTaxFreePrice;
+    operationPrice *= 100;
+
+    const price = operationPrice + operationPrice * tax;
+    return {...day, taxFreePrice: operationPrice / 100, price: price / 100};
   }
 
   onDayChange(day, name, value) {
@@ -301,10 +329,33 @@ class WorkingDay extends Component{
     this.setState({data: data});
   }
 
+  onConstructionSiteChange(name, value) {
+    const data = this.state.data;
+    const constructionSiteInfo = data.constructionSiteInfo;
+
+    if (name === 'client' || name === 'place') {
+      const newConstructionSiteInfo = {...constructionSiteInfo, [name]: value}
+      this.setState({data: {...data, constructionSiteInfo: newConstructionSiteInfo}});
+    }
+    else {
+      const rate = constructionSiteInfo.rate;
+      const newRate = {...rate, [name]: parseFloat(value)};
+      const newConstructionSiteInfo = {...constructionSiteInfo, rate: newRate};
+
+      this.setState({data: {...data, constructionSiteInfo: newConstructionSiteInfo}}, () => {
+        const workingDays = this.state.data.workingDays.map(d => this.taxFreePrice(d))
+        this.setState({data: {...this.state.data, workingDays: workingDays}});
+      });
+    }
+  }
+
   render() {
     return (
       <table className="Working-Days">
-        <GlobalInfo constructionSiteInfo={this.state.data.constructionSiteInfo} />
+        <GlobalInfo
+          constructionSiteInfo={this.state.data.constructionSiteInfo}
+          onConstructionSiteChange={this.onConstructionSiteChange}
+        />
         <Day
           days={this.state.data.workingDays}
           onDayChange={this.onDayChange}
