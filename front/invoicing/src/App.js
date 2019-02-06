@@ -9,19 +9,24 @@ function SelectButton({onClick}){
   )
 }
 
-function TableHeader({onNewWorkDay}) {
+function TableHeader({nbDayWork, nbTransfer, nbDayWithHours, onNewWorkDay}) {
   return (
     <thead>
       <tr>
         <th>Nombreux de jour travaillé:</th>
-        <th>2</th>
+        <th>{nbDayWork}</th>
         <th rowSpan="2" colSpan="4">
           <SelectButton onClick={onNewWorkDay}/>
         </th>
       </tr>
       <tr>
         <th>Nombreux de transfert:</th>
-        <th>2</th>
+        <th>{nbTransfer}</th>
+        <th></th>
+      </tr>
+      <tr>
+        <th>Nombreux de jour partiel:</th>
+        <th>{nbDayWithHours}</th>
         <th></th>
       </tr>
     </thead>
@@ -29,14 +34,12 @@ function TableHeader({onNewWorkDay}) {
 }
 
 function TableBody(props) {
-  const days = props.workingDays.map(wd => {
+  const days = props.days.map(wd => {
     return (
       <tr key={wd.id}>
         <td>{wd.date}</td>
         <td>{wd.client}</td>
         <td>{wd.place}</td>
-        <td>{wd.type}</td>
-        <td>{wd.taxFreePrice}</td>
         <td>{wd.price}</td>
       </tr>
     );
@@ -57,18 +60,75 @@ function TableBody(props) {
   );
 }
 
-class WorkingDays extends Component {
+class ConstructionsSite extends Component {
   constructor(props){
     super(props);
 
-    this.state = {};
+    this.state = {
+      data: [
+        {
+          constructionSiteInfo: {
+            client: "Eurovia",
+            place: "Paris",
+            rate: {
+              hourTaxFreePrice: 90.0,
+              dayTaxFreePrice: 800.0,
+              taxPercent: 20
+            }
+          },
+          workingDays: [{
+            id: 1,
+            date: "2019-03-01",
+            type: "TRANSFER",
+            taxFreePrice: 80.2,
+            price: 90.5,
+            hours: null
+          }, {
+            id: 2,
+            date: "2019-03-02",
+            type: "DAY",
+            taxFreePrice: 60.2,
+            price: 80.5,
+            hours: null
+          }]
+        },
+        {
+          constructionSiteInfo: {
+            client: "Gille",
+            place: "Paris",
+            rate: {
+              hourTaxFreePrice: 180.0,
+              dayTaxFreePrice: 1800.0,
+              taxPercent: 50
+            }
+          },
+          workingDays: [{
+            id: 1,
+            date: "2019-06-04",
+            type: "TRANSFER",
+            taxFreePrice: 80.2,
+            price: 90.5,
+            hours: null
+          }]
+        }
+      ],
+    };
   }
 
+  nbDay = (days, key) => days.reduce((acc, d) => acc + d.type === key, 0);
+
   render() {
+    const days = this.state.data.reduce((acc, d) => [...acc, d.workingDays], [])
+
     return (
       <table className="General-info">
         <TableHeader onNewWorkDay={this.props.onNewWorkDay}/>
-        <TableBody workingDays={this.state.workingDays} />
+        <TableBody
+          nbDayWork={this.nbDay(days, "DAY")}
+          nbDayWithHours={this.nbDay(days, "HOURS")}
+          nbTransfer={this.nbDay(days, "TRANSFER")}
+          days={days}
+         />
       </table>
     );
   }
@@ -100,7 +160,7 @@ function Info(props){
         <th>
           <label forhtml="client">Client </label>
           <input name="client" list="clients" defaultValue={info.client} onChange={onConstructionSiteChange} onBlur={onConstructionSiteChange}/>
-          <datalist id="clients">{props.clients.map(c => <option value={c} key={c}/>)}</datalist>
+          <datalist id="clients">{props.clients.map(c => <option value={c} key={c.id}/>)}</datalist>
         </th>
         {inputNumber("hourTaxFreePrice", "Prix horaire HT ", 5)}
       </tr>
@@ -344,8 +404,8 @@ class App extends Component {
       <div className="App">
         <p>Menu principal</p>
         <header className="App-header">
-          {//this.state.onNewWorkDay ?
-            <ConstructionSite />// : <WorkingDays onNewWorkDay={this.newWorkDay}/>
+          {this.state.onNewWorkDay ?
+            <ConstructionSite /> : <ConstructionsSite onNewWorkDay={this.newWorkDay}/>
           }
         </header>
       </div>
