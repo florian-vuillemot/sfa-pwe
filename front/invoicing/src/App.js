@@ -142,48 +142,63 @@ function TableDay(props){
 }
 
 function DayInfo(props){
-  const day = props.day ? props.day : {};
+  const day = props.day;
   const onDayChange = (event) => props.onDayChange(day, event.target.name, event.target.value);
 
   return (
     <tr>
       <td>
-        <input type="date" name="date" defaultValue={day.date} onChange={onDayChange}/>
+        <p><input type="date" name="date" defaultValue={day.date} onChange={onDayChange}/></p>
       </td>
       <td>
-        <select name="type" defaultValue={day.type} onChange={onDayChange}>
-          <option value="TRANSFER">Transfert</option>
-          <option value="DAY">Jour complet</option>
-          <option value="HOURS">Heures travaillé</option>
-        </select>
+        <p>
+          <select name="type" defaultValue={day.type} onChange={onDayChange}>
+            <option value="TRANSFER">Transfert</option>
+            <option value="DAY">Jour complet</option>
+            <option value="HOURS">Heures travaillé</option>
+          </select>
+        </p>
       </td>
       <td>
-        {day.type === "HOURS" ? <input type="number" name="hours" step="any" defaultValue={day.hours} onChange={onDayChange}/> : null}
+        <p>
+          {day.type === "HOURS" ? <input type="number" name="hours" step="any" defaultValue={day.hours} onChange={onDayChange}/> : null}
+        </p>
       </td>
       <td>
         {day.type === "TRANSFER" ?
-          <input type="number" name="taxFreePrice" step="any" defaultValue={day.taxFreePrice} onChange={onDayChange}/>
+          <p><input type="number" name="taxFreePrice" step="any" defaultValue={day.taxFreePrice} onChange={onDayChange}/></p>
           : <p>{day.taxFreePrice}</p>
         }
       </td>
       <td>
-        {day.price}
+        <p>{day.price}</p>
       </td>
       <td>
-        <i className="fa fa-trash"></i>
+        <i className="fa fa-trash" onClick={(_) => props.deleteDay(day)}></i>
       </td>
     </tr>
   );
 }
 
+function newDay(){
+  return {
+    id: 10,
+    date: null,
+    type: null,
+    taxFreePrice: null,
+    price: null
+  };
+}
+
 function Day(props){
   const newDayNeed = (daysSorted) => {
     const len = daysSorted.length;
+    const day = newDay();
 
-    return len > 0 && daysSorted[len - 1].date ? <DayInfo onDayChange={props.onDayChange}/> : null;
+    return len === 0 || !daysSorted.find(d => !d.date) ? <DayInfo day={day} key={day.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/> : null;
   };
-  const daysSorted = props.days.sort((d1, d2) => d1.date < d2.date);
-  const days = daysSorted.map(d => <DayInfo day={d} key={d.id} onDayChange={props.onDayChange}/>)
+  const daysSorted = props.days.sort((d1, d2) => d1.date ? d1.date < d2.date : true);
+  const days = daysSorted.map(d => <DayInfo day={d} key={d.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/>)
 
   return (
     <tbody>
@@ -214,18 +229,39 @@ class WorkingDay extends Component{
           date: "2019-03-01",
           type: "TRANSFER",
           taxFreePrice: 80.2,
-          price: 90.5
+          price: 90.5,
+          hours: null
         }, {
           id: 2,
           date: "2019-03-02",
           type: "DAY",
           taxFreePrice: 60.2,
-          price: 80.5
+          price: 80.5,
+          hours: null
         }]
       }
     };
 
     this.onDayChange = this.onDayChange.bind(this);
+    this.deleteDay = this.deleteDay.bind(this);
+  }
+
+  taxFreePrice(day, transferTaxFreePrice = null) {
+    const data = this.state.data;
+    const tax = data.constructionSiteInfo.rate.taxPercent / 100;
+
+    if (day.hours !== null && day.hours !== undefined) {
+      const hoursTaxFree = data.constructionSiteInfo.rate.hourTaxFreePrice * 100;
+      const priceTaxFree = hoursTaxFree * day.hours;
+      const price = priceTaxFree + priceTaxFree * tax;
+      return {...day, taxFreePrice: priceTaxFree / 100, price: price / 100};
+    }
+    console.log(transferTaxFreePrice)
+    const dayPrice = (transferTaxFreePrice ? transferTaxFreePrice : data.constructionSiteInfo.rate.dayTaxFreePrice) * 100;
+    const price = dayPrice + dayPrice * tax; 
+    console.log(dayPrice)
+    console.log(price)
+    return {...day, taxFreePrice: dayPrice / 100, price: price / 100};
   }
 
   onDayChange(day, name, value) {
@@ -234,12 +270,21 @@ class WorkingDay extends Component{
       (day, name, value) => {
         if (name === 'type') {
           if (value === 'HOURS') {
-            return {...day, hours: 0.0, taxFreePrice: 0.0, price: 0.0, type: value}
+            return this.taxFreePrice({...day, hours: 0.0, type: value})
           }
-          if (value === 'TRANSFER') {
-            return {...day, hours: null, taxFreePrice: 0.0, price: 0.0, type: value}
-          }
-          return {...day, hours: null, taxFreePrice: this.state.data.constructionSiteInfo.rate.dayTaxFreePrice, price: 0.0, type: value}
+          return this.taxFreePrice({...day, hours: null, type: value})
+        }
+        return day;
+      },
+      (day, name, value) => {
+        if (name === 'hours'){
+          return this.taxFreePrice({...day, hours: value})
+        }
+        return day;
+      },
+      (day, name, value) => {
+        if (name === 'taxFreePrice') {
+          return this.taxFreePrice(day, value)
         }
         return day;
       }
@@ -250,6 +295,12 @@ class WorkingDay extends Component{
     this.setState({data: data});
   }
 
+  deleteDay(day) {
+    const workingDays = this.state.data.workingDays.filter(d => d.id !== day.id);
+    const data = {...this.state.data, workingDays: workingDays}
+    this.setState({data: data});
+  }
+
   render() {
     return (
       <table className="Working-Days">
@@ -257,6 +308,7 @@ class WorkingDay extends Component{
         <Day
           days={this.state.data.workingDays}
           onDayChange={this.onDayChange}
+          deleteDay={this.deleteDay}
         />
       </table>
     );
