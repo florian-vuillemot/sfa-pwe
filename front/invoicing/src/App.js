@@ -13,34 +13,36 @@ function TableHeader({nbDayWork, nbTransfer, nbDayWithHours, onNewWorkDay}) {
   return (
     <thead>
       <tr>
-        <th>Nombreux de jour travaillé:</th>
-        <th>{nbDayWork}</th>
-        <th rowSpan="2" colSpan="4">
+        <th>Nombreux de jour complet: {nbDayWork}</th>
+        <th className="To-Right"></th>
+        <th rowSpan="3" colSpan="4">
           <SelectButton onClick={onNewWorkDay}/>
         </th>
       </tr>
       <tr>
-        <th>Nombreux de transfert:</th>
-        <th>{nbTransfer}</th>
+        <th>Nombreux de transfert: {nbTransfer}</th>
         <th></th>
       </tr>
       <tr>
-        <th>Nombreux de jour partiel:</th>
-        <th>{nbDayWithHours}</th>
+        <th>Nombreux de jour partiel: {nbDayWithHours}</th>
         <th></th>
       </tr>
     </thead>
   );
 }
 
-function TableBody(props) {
-  const days = props.days.map(wd => {
+function TableBody({data}) {
+  const count = (d, key) => d.workingDays.reduce((acc, d) => d[key] + acc, 0);
+  const countType = (d, type) => d.workingDays.reduce((acc, d) => (d.type === type) + acc, 0);
+  const constructionsSite = data.map((d, idx) => {
     return (
-      <tr key={wd.id}>
-        <td>{wd.date}</td>
-        <td>{wd.client}</td>
-        <td>{wd.place}</td>
-        <td>{wd.price}</td>
+      <tr key={idx}>
+        <td>{d.constructionSiteInfo.client}</td>
+        <td>{d.constructionSiteInfo.place}</td>
+        <td>{countType(d, "TRANSFER")}</td>
+        <td>{countType(d, "DAY")}</td>
+        <td>{countType(d, "HOURS")}</td>
+        <td>{count(d, "price")}</td>
       </tr>
     );
   });
@@ -48,14 +50,14 @@ function TableBody(props) {
   return (
     <tbody>
       <tr>
-        <th>Date</th>
         <th>Client</th>
         <th>Lieu</th>
-        <th>Type</th>
-        <th>Prix HT</th>
+        <th>Transfert</th>
+        <th>Jour complet</th>
+        <th>Jour partiel</th>
         <th>Prix TTC</th>
       </tr>
-      {days}
+      {constructionsSite}
     </tbody>
   );
 }
@@ -115,19 +117,21 @@ class ConstructionsSite extends Component {
     };
   }
 
-  nbDay = (days, key) => days.reduce((acc, d) => acc + d.type === key, 0);
+  nbDay = (days, key) => days.reduce((acc, d) => acc + (d.type === key), 0);
 
   render() {
-    const days = this.state.data.reduce((acc, d) => [...acc, d.workingDays], [])
+    const days = this.state.data.reduce((acc, d) => [...acc, ...d.workingDays], [])
 
     return (
       <table className="General-info">
-        <TableHeader onNewWorkDay={this.props.onNewWorkDay}/>
-        <TableBody
+        <TableHeader
+          onNewWorkDay={this.props.onNewWorkDay}
           nbDayWork={this.nbDay(days, "DAY")}
           nbDayWithHours={this.nbDay(days, "HOURS")}
           nbTransfer={this.nbDay(days, "TRANSFER")}
-          days={days}
+        />
+        <TableBody
+          data={this.state.data}
          />
       </table>
     );
