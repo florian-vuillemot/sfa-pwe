@@ -1,0 +1,42 @@
+.Working-Days {
+    width: 80%;
+    text-align: left;
+}
+
+.Working-Days > thead > tr > th:first-child {
+    width: 300px
+}
+
+.Working-Days > thead > tr > th:last-child {
+    text-align: right
+}
+  
+.Working-Days > tbody > tr > th, .Working-Days > tbody > tr > td {
+    text-align: center
+}
+  
+.Working-Days > tfoot {
+    text-align: right;
+}
+
+tfoot > tr > td {
+    text-align: center;
+}
+
+.UpdateDay {
+    border: none;
+    margin: auto;
+    text-align: center;
+    text-decoration: none;
+    transition: all ease 0.4s;
+    cursor: pointer;
+    background-color: white;
+    width: 90%;
+    height: 90%;  
+}
+
+.UpdateDay:hover {
+    background-color: lightgreen;
+    width: 100%;
+    height: 100%;
+}  
