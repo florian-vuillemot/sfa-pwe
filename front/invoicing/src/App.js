@@ -31,12 +31,12 @@ function TableHeader({nbDayWork, nbTransfer, nbDayWithHours, onNewWorkDay}) {
   );
 }
 
-function TableBody({data}) {
+function TableBody({data, onConstructionSiteSelect}) {
   const count = (d, key) => d.workingDays.reduce((acc, d) => d[key] + acc, 0);
   const countType = (d, type) => d.workingDays.reduce((acc, d) => (d.type === type) + acc, 0);
   const constructionsSite = data.map((d, idx) => {
     return (
-      <tr key={idx}>
+      <tr key={idx} onClick={() => onConstructionSiteSelect(d)}>
         <td>{d.constructionSiteInfo.client}</td>
         <td>{d.constructionSiteInfo.place}</td>
         <td>{countType(d, "TRANSFER")}</td>
@@ -132,6 +132,7 @@ class ConstructionsSite extends Component {
         />
         <TableBody
           data={this.state.data}
+          onConstructionSiteSelect={this.props.onConstructionSiteSelect}
          />
       </table>
     );
@@ -261,32 +262,7 @@ class ConstructionSite extends Component{
 
     this.state = {
       clients: ["Eurovia", "Gille", "Paul"],
-      data: {
-        constructionSiteInfo: {
-          client: "Eurovia",
-          place: "Paris",
-          rate: {
-            hourTaxFreePrice: 90.0,
-            dayTaxFreePrice: 800.0,
-            taxPercent: 20
-          }
-        },
-        workingDays: [{
-          id: 1,
-          date: "2019-03-01",
-          type: "TRANSFER",
-          taxFreePrice: 80.2,
-          price: 90.5,
-          hours: null
-        }, {
-          id: 2,
-          date: "2019-03-02",
-          type: "DAY",
-          taxFreePrice: 60.2,
-          price: 80.5,
-          hours: null
-        }]
-      }
+      data: props.constructionSite
     };
 
     this.onDayChange = this.onDayChange.bind(this);
@@ -391,15 +367,24 @@ class App extends Component {
     super(props);
     
     this.state = {
-      onNewWorkDay: false
+      onNewWorkDay: false,
+      constructionSite: null
     };
 
     this.newWorkDay = this.newWorkDay.bind(this);
+    this.constructionSiteSelect = this.constructionSiteSelect.bind(this);
   }
 
   newWorkDay(){
     this.setState({
-      onNewWorkDay: true
+      onNewWorkDay: true,
+      constructionSite: null
+    })
+  }
+
+  constructionSiteSelect(c){
+    this.setState({
+      constructionSite: c
     })
   }
 
@@ -408,8 +393,14 @@ class App extends Component {
       <div className="App">
         <p>Menu principal</p>
         <header className="App-header">
-          {this.state.onNewWorkDay ?
-            <ConstructionSite /> : <ConstructionsSite onNewWorkDay={this.newWorkDay}/>
+          {this.state.onNewWorkDay || this.state.constructionSite ?
+            <ConstructionSite
+              constructionSite={this.state.constructionSite}
+            />
+            : <ConstructionsSite
+                onNewWorkDay={this.newWorkDay}
+                onConstructionSiteSelect={this.constructionSiteSelect}
+              />
           }
         </header>
       </div>
