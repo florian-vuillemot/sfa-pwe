@@ -1,22 +1,16 @@
 import React, { Component } from 'react';
 import './ConstructionsSite.css';
-
-function SelectButton({onClick}){
-    return (
-        <button className="buttonStyle normalWidth" onClick={onClick}>
-            Ajouter un chantier
-        </button>
-    )
-}
   
-function TableHeader({nbDayWork, nbTransfer, nbDayWithHours, onNewWorkDay}) {
+function GeneralInformation({nbDayWork, nbTransfer, nbDayWithHours, onNewWorkDay}) {
     return (
       <thead>
         <tr>
           <th>Nombreux de jour complet: {nbDayWork}</th>
           <th className="To-Right"></th>
           <th rowSpan="3" colSpan="4">
-            <SelectButton onClick={onNewWorkDay}/>
+            <button className="buttonStyle normalWidth" onClick={onNewWorkDay}>
+              Ajouter un chantier
+            </button>
           </th>
         </tr>
         <tr>
@@ -31,7 +25,7 @@ function TableHeader({nbDayWork, nbTransfer, nbDayWithHours, onNewWorkDay}) {
     );
 }
   
-function TableBody({data, onConstructionSiteSelect}) {
+function RenderAll({data, onConstructionSiteSelect}) {
     const count = (d, key) => d.workingDays.reduce((acc, d) => d[key] + acc, 0);
     const countType = (d, type) => d.workingDays.reduce((acc, d) => (d.type === type) + acc, 0);
     const daysSorted = data.sort((d1, d2) => d1.price > d2.price);
@@ -79,13 +73,13 @@ class ConstructionsSite extends Component {
   
       return (
         <table className="General-info">
-          <TableHeader
+          <GeneralInformation
             onNewWorkDay={this.props.onNewWorkDay}
             nbDayWork={this.nbDay(days, "DAY")}
             nbDayWithHours={this.nbDay(days, "HOURS")}
             nbTransfer={this.nbDay(days, "TRANSFER")}
           />
-          <TableBody
+          <RenderAll
             data={this.state.data}
             onConstructionSiteSelect={this.props.onConstructionSiteSelect}
            />

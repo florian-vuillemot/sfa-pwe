@@ -187,14 +187,14 @@ class ConstructionSite extends Component{
         return (
         <table className="Working-Days">
             <Info
-            clients={this.state.clients}
-            constructionSiteInfo={this.state.data.constructionSiteInfo}
-            onConstructionSiteChange={this.onConstructionSiteChange}
+                clients={this.state.clients}
+                constructionSiteInfo={this.state.data.constructionSiteInfo}
+                onConstructionSiteChange={this.onConstructionSiteChange}
             />
             <Days
-            days={this.state.data.workingDays}
-            onDayChange={this.onDayChange}
-            deleteDay={this.deleteDay}
+                days={this.state.data.workingDays}
+                onDayChange={this.onDayChange}
+                deleteDay={this.deleteDay}
             />
             <tfoot>
             <tr>
