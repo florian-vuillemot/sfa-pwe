@@ -6,9 +6,9 @@ function GeneralInformation({nbDayWork, nbTransfer, nbDayWithHours, onNewWorkDay
       <thead>
         <tr>
           <th>Nombreux de jour complet: {nbDayWork}</th>
-          <th className="To-Right"></th>
+          <th></th>
           <th rowSpan="3" colSpan="4">
-            <button className="buttonStyle normalWidth" onClick={onNewWorkDay}>
+            <button onClick={onNewWorkDay}>
               Ajouter un chantier
             </button>
           </th>
@@ -29,9 +29,9 @@ function RenderAll({data, onConstructionSiteSelect}) {
     const count = (d, key) => d.workingDays.reduce((acc, d) => d[key] + acc, 0);
     const countType = (d, type) => d.workingDays.reduce((acc, d) => (d.type === type) + acc, 0);
     const daysSorted = data.sort((d1, d2) => d1.price > d2.price);
-    const constructionsSite = daysSorted.map((d, idx) => {
+    const constructionsSite = daysSorted.map(d => {
       return (
-        <tr key={idx} onClick={() => onConstructionSiteSelect(d)}>
+        <tr key={d.id} onClick={() => onConstructionSiteSelect(d)}>
           <td>{d.constructionSiteInfo.client}</td>
           <td>{d.constructionSiteInfo.place}</td>
           <td>{countType(d, "TRANSFER")}</td>
@@ -72,7 +72,7 @@ class ConstructionsSite extends Component {
       const days = this.state.data.reduce((acc, d) => [...acc, ...d.workingDays], [])
   
       return (
-        <table className="General-info">
+        <table>
           <GeneralInformation
             onNewWorkDay={this.props.onNewWorkDay}
             nbDayWork={this.nbDay(days, "DAY")}

@@ -1,29 +1,26 @@
-.Working-Days {
+.Construction-Site {
     width: 80%;
     text-align: left;
 }
-
-.Working-Days > thead > tr > th:first-child {
+.Construction-Site > thead > tr > th:first-child {
     width: 300px
 }
-
-.Working-Days > thead > tr > th:last-child {
+.Construction-Site > thead > tr > th:last-child {
     text-align: right
-}
-  
-.Working-Days > tbody > tr > th, .Working-Days > tbody > tr > td {
+} 
+.Construction-Site > tbody > tr > th, .Construction-Site > tbody > tr > td {
     text-align: center
-}
-  
-.Working-Days > tfoot {
+} 
+.Construction-Site > tfoot {
     text-align: right;
 }
+
+
 
 tfoot > tr > td {
     text-align: center;
 }
-
-.UpdateDay {
+tfoot > tr > td > button {
     border: none;
     margin: auto;
     text-align: center;
@@ -32,11 +29,14 @@ tfoot > tr > td {
     cursor: pointer;
     background-color: white;
     width: 90%;
-    height: 90%;  
+    height: 90%;   
 }
-
-.UpdateDay:hover {
+tfoot > tr > td > button:hover {
     background-color: lightgreen;
     width: 100%;
     height: 100%;
-}  
+}
+tfoot > tr:last-child > td > button:hover {
+    background-color: red;
+}
+ 

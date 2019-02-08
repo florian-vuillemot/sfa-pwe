@@ -93,7 +93,6 @@ function Days(props){
     const newDayNeed = (daysSorted) => {
         const len = daysSorted.length;
         const day = newDay(daysSorted);
-        console.log(day);
         const createDay = len === 0 || !daysSorted.find(d => !d.date);
         return createDay ? <Day day={day} key={day.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/> : null;
     };
@@ -119,8 +118,8 @@ class ConstructionSite extends Component{
         super(props);
 
         this.state = {
-        clients: ["Eurovia", "Gille", "Paul"],
-        data: props.constructionSite
+            clients: ["Eurovia", "Gille", "Paul"],
+            data: props.constructionSite
         };
 
         this.onDayChange = this.onDayChange.bind(this);
@@ -134,10 +133,10 @@ class ConstructionSite extends Component{
         const tax = rate.taxPercent / 100;
 
         if (day.hours !== null && day.hours !== undefined) {
-        return {...day, ...hoursPrice(day.hours, rate.hourTaxFreePrice, tax)};
+            return {...day, ...hoursPrice(day.hours, rate.hourTaxFreePrice, tax)};
         }
         if (day.type === "TRANSFER") {
-        return {...day, ...getPrice(transferTaxFreePrice ? transferTaxFreePrice : day.taxFreePrice, tax)};
+            return {...day, ...getPrice(transferTaxFreePrice ? transferTaxFreePrice : day.taxFreePrice, tax)};
         }
         return {...day, ...getPrice(rate.dayTaxFreePrice, tax)};
     }
@@ -168,24 +167,24 @@ class ConstructionSite extends Component{
         const constructionSiteInfo = data.constructionSiteInfo;
 
         if (name === 'client' || name === 'place') {
-        const newConstructionSiteInfo = {...constructionSiteInfo, [name]: value}
-        this.setState({data: {...data, constructionSiteInfo: newConstructionSiteInfo}});
+            const newConstructionSiteInfo = {...constructionSiteInfo, [name]: value}
+            this.setState({data: {...data, constructionSiteInfo: newConstructionSiteInfo}});
         }
         else {
-        const rate = constructionSiteInfo.rate;
-        const newRate = {...rate, [name]: parseFloat(value)};
-        const newConstructionSiteInfo = {...constructionSiteInfo, rate: newRate};
+            const rate = constructionSiteInfo.rate;
+            const newRate = {...rate, [name]: parseFloat(value)};
+            const newConstructionSiteInfo = {...constructionSiteInfo, rate: newRate};
 
-        this.setState({data: {...data, constructionSiteInfo: newConstructionSiteInfo}}, () => {
-            const workingDays = this.state.data.workingDays.map(d => this.calculPrices(d))
-            this.setState({data: {...this.state.data, workingDays: workingDays}});      
-        });
+            this.setState({data: {...data, constructionSiteInfo: newConstructionSiteInfo}}, () => {
+                const workingDays = this.state.data.workingDays.map(d => this.calculPrices(d))
+                this.setState({data: {...this.state.data, workingDays: workingDays}});      
+            });
         }
     }
 
     render() {
         return (
-        <table className="Working-Days">
+        <table className="Construction-Site">
             <Info
                 clients={this.state.clients}
                 constructionSiteInfo={this.state.data.constructionSiteInfo}
@@ -197,13 +196,24 @@ class ConstructionSite extends Component{
                 deleteDay={this.deleteDay}
             />
             <tfoot>
-            <tr>
-                <td colSpan="6">
-                <button className="UpdateDay" onClick={() => this.props.onUpdate(this.state.data)}>
-                    Valider
-                </button>
-                </td>
-            </tr>
+                <tr>
+                    <td colSpan="6">
+                        <button onClick={() => this.props.onUpdate(this.state.data)}>
+                            Valider
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colSpan="6">
+                        <button
+                            onClick={
+                                () => window.confirm('Voulez-vous vraiment supprimer ce chantier ?') ? this.props.onDeleteConstructionSite(this.state.data.id) : null
+                            }
+                        >
+                            Supprimer
+                        </button>
+                    </td>
+                </tr>
             </tfoot>
         </table>
         );

@@ -68,6 +68,7 @@ class App extends Component {
     this.constructionSiteSelect = this.constructionSiteSelect.bind(this);
     this.constructionSiteUpdate = this.constructionSiteUpdate.bind(this);
     this.constructionSiteTemplate = this.constructionSiteTemplate.bind(this);
+    this.deleteConstructionSite = this.deleteConstructionSite.bind(this);
   }
 
   constructionSiteTemplate(){
@@ -112,6 +113,17 @@ class App extends Component {
     });
   }
 
+  deleteConstructionSite(constructionSiteId) {
+    const newData = this.state.data.filter(d => d.id !== constructionSiteId);
+    console.log(newData);
+    this.setState({
+      data: newData,
+      onNewWorkDay: false,
+      constructionSiteSelect: false,
+      constructionSite: null
+    });
+  }
+
   render() {
     return (
       <div className="App">
@@ -121,6 +133,7 @@ class App extends Component {
             <ConstructionSite
               constructionSite={this.state.constructionSite}
               onUpdate={this.constructionSiteUpdate}
+              onDeleteConstructionSite={this.deleteConstructionSite}
             />
             : <ConstructionsSite
                 data={this.state.data}
