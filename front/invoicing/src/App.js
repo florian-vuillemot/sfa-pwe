@@ -1,68 +1,75 @@
 import React, { Component } from 'react';
 import './App.css';
-import ConstructionSite from './ConstructionSite/ConstructionSite.js';
-import ConstructionsSite from './ConstructionsSite/ConstructionsSite.js';
+import {ConstructionSite as ConstructionSiteView} from './ConstructionSite/ConstructionSite';
+import {ConstructionsSite as ConstructionsSiteView} from './ConstructionsSite/ConstructionsSite';
+import {ConstructionsSite, ConstructionSite} from './lib/ConstructionsSite';
 
+function GetConstructionsSite() {
+  const data = [
+    {
+      id: 1,
+      constructionSiteInfo: {
+        client: "Eurovia",
+        place: "Paris",
+        rate: {
+          hourTaxFreePrice: 90.0,
+          dayTaxFreePrice: 800.0,
+          taxPercent: 20
+        }
+      },
+      workingDays: [{
+        id: 1,
+        date: "2019-03-01",
+        type: "TRANSFER",
+        taxFreePrice: 80.2,
+        price: 90.5,
+        hours: null
+      }, {
+        id: 2,
+        date: "2019-03-02",
+        type: "DAY",
+        taxFreePrice: 60.2,
+        price: 80.5,
+        hours: null
+      }]
+    },
+    {
+      id: 2,
+      constructionSiteInfo: {
+        client: "Gille",
+        place: "Paris",
+        rate: {
+          hourTaxFreePrice: 180.0,
+          dayTaxFreePrice: 1800.0,
+          taxPercent: 50
+        }
+      },
+      workingDays: [{
+        id: 1,
+        date: "2019-06-04",
+        type: "TRANSFER",
+        taxFreePrice: 80.2,
+        price: 90.5,
+        hours: null
+      }]
+    }
+  ];
+
+  return new ConstructionsSite(data);
+}
 
 class App extends Component {
   constructor(props){
     super(props);
+
+    const data = GetConstructionsSite();
     
     this.state = {
       onNewWorkDay: false,
       constructionSiteSelect: false,
-      data: [
-        {
-          id: 1,
-          constructionSiteInfo: {
-            client: "Eurovia",
-            place: "Paris",
-            rate: {
-              hourTaxFreePrice: 90.0,
-              dayTaxFreePrice: 800.0,
-              taxPercent: 20
-            }
-          },
-          workingDays: [{
-            id: 1,
-            date: "2019-03-01",
-            type: "TRANSFER",
-            taxFreePrice: 80.2,
-            price: 90.5,
-            hours: null
-          }, {
-            id: 2,
-            date: "2019-03-02",
-            type: "DAY",
-            taxFreePrice: 60.2,
-            price: 80.5,
-            hours: null
-          }]
-        },
-        {
-          id: 2,
-          constructionSiteInfo: {
-            client: "Gille",
-            place: "Paris",
-            rate: {
-              hourTaxFreePrice: 180.0,
-              dayTaxFreePrice: 1800.0,
-              taxPercent: 50
-            }
-          },
-          workingDays: [{
-            id: 1,
-            date: "2019-06-04",
-            type: "TRANSFER",
-            taxFreePrice: 80.2,
-            price: 90.5,
-            hours: null
-          }]
-        }
-      ],
+      data: data,
+      constructionSite: this.constructionSiteTemplate(data)
     };
-
-    this.setState({constructionSite: this.constructionSiteTemplate()});
 
     this.newWorkDay = this.newWorkDay.bind(this);
     this.constructionSiteSelect = this.constructionSiteSelect.bind(this);
@@ -71,22 +78,7 @@ class App extends Component {
     this.deleteConstructionSite = this.deleteConstructionSite.bind(this);
   }
 
-  constructionSiteTemplate(){
-    const id = this.state.data.length ? this.state.data.sort((d1, d2) => d1.id < d2.id)[0].id + 1 : 0;
-    return {
-      id: id,
-      constructionSiteInfo: {
-        client: null,
-        place: null,
-        rate: {
-          hourTaxFreePrice: 90.0,
-          dayTaxFreePrice: 800.0,
-          taxPercent: 20
-        }
-      },
-      workingDays: []
-    };
-  }
+  constructionSiteTemplate = (data = null) => ConstructionSite.template(data ? data : this.state.data);
 
   newWorkDay(){
     this.setState({
@@ -115,7 +107,6 @@ class App extends Component {
 
   deleteConstructionSite(constructionSiteId) {
     const newData = this.state.data.filter(d => d.id !== constructionSiteId);
-    console.log(newData);
     this.setState({
       data: newData,
       onNewWorkDay: false,
@@ -130,12 +121,12 @@ class App extends Component {
         <p>Menu principal</p>
         <header className="App-header">
           {this.state.onNewWorkDay || this.state.constructionSiteSelect ?
-            <ConstructionSite
+            <ConstructionSiteView
               constructionSite={this.state.constructionSite}
               onUpdate={this.constructionSiteUpdate}
               onDeleteConstructionSite={this.deleteConstructionSite}
             />
-            : <ConstructionsSite
+            : <ConstructionsSiteView
                 data={this.state.data}
                 onNewWorkDay={this.newWorkDay}
                 onConstructionSiteSelect={this.constructionSiteSelect}

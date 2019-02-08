@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import './ConstructionSite.css';
+import {WorkingDay, ConstructionSite as ConstructionSiteObj} from '../lib/ConstructionsSite';
 
 function Info(props){
     const info = props.constructionSiteInfo;
-    const rate = info.rate;
   
     const onConstructionSiteChange = (e) => props.onConstructionSiteChange(e.target.name, e.target.value);
-    const inputNumber = (name, text, colSpan) => {
+    const inputNumber = (name, value, text, colSpan) => {
       return (
         <th colSpan={colSpan}>
           <label forhtml={name}>{text}</label>
-          <input type="number" name={name} step="any" defaultValue={rate[name]} onChange={onConstructionSiteChange}/>
+          <input type="number" name={name} step="any" defaultValue={value} onChange={onConstructionSiteChange}/>
         </th>
       );
     }
@@ -23,18 +23,18 @@ function Info(props){
             <input name="client" list="clients" defaultValue={info.client} onChange={onConstructionSiteChange} onBlur={onConstructionSiteChange}/>
             <datalist id="clients">{props.clients.map(c => <option value={c} key={c}/>)}</datalist>
           </th>
-          {inputNumber("hourTaxFreePrice", "Prix horaire HT ", 5)}
+          {inputNumber("hourPrice", info.hourPrice, "Prix horaire HT ", 5)}
         </tr>
         <tr>
           <th>
             <label forhtml="place">Lieu </label>
-            <input type="text" name="place" defaultValue={info.place} onChange={onConstructionSiteChange}/>
+            <input type="text" name="place" defaultValue={info.place} onChange={onConstructionSiteChange} onBlur={onConstructionSiteChange}/>
           </th>
-          {inputNumber("dayTaxFreePrice", "Prix journalier HT ", 5)}
+          {inputNumber("dayPrice", info.dayPrice, "Prix journalier HT ", 5)}
         </tr>
         <tr>
           <th></th>
-          {inputNumber("taxPercent", "TVA (en %) ", 6)}
+          {inputNumber("taxPercent", info.taxPercent, "TVA (en %) ", 6)}
         </tr>
       </thead>
     );
@@ -113,7 +113,7 @@ function Days(props){
     )
 }
 
-class ConstructionSite extends Component{
+export class ConstructionSite extends Component{
     constructor(props){
         super(props);
 
@@ -127,26 +127,25 @@ class ConstructionSite extends Component{
         this.onConstructionSiteChange = this.onConstructionSiteChange.bind(this);
     }
 
-    calculPrices(day, transferTaxFreePrice = null) {
+    calculPrices(day, hours = null, type = null, transferPrice = null) {
         const data = this.state.data;
-        const rate = data.constructionSiteInfo.rate;
-        const tax = rate.taxPercent / 100;
+        const tax = data.taxPercent / 100;
 
-        if (day.hours !== null && day.hours !== undefined) {
-            return {...day, ...hoursPrice(day.hours, rate.hourTaxFreePrice, tax)};
+        if (hours !== null) {
+            return WorkingDay.updateHoursPrice(day, hours, data.hourPrice, tax);
         }
-        if (day.type === "TRANSFER") {
-            return {...day, ...getPrice(transferTaxFreePrice ? transferTaxFreePrice : day.taxFreePrice, tax)};
+        if (type === "TRANSFER") {
+            return WorkingDay.updatePrice(day, transferPrice ? transferPrice : day.dayPrice, tax);
         }
-        return {...day, ...getPrice(rate.dayTaxFreePrice, tax)};
+        return WorkingDay.updatePrice(day, data.dayPrice, tax);
     }
 
     onDayChange(day, name, value) {
         const dayChangeOperations = [
-        (day, name, value) => name === "date" ? {...day, date: value} : day,
-        (day, name, value) => name === 'hours' ? this.calculPrices({...day, hours: value}) : day,
-        (day, name, value) => name === 'taxFreePrice' ? this.calculPrices(day, value) : day,
-        (day, name, value) => name === 'type' ? this.calculPrices({...day, hours: value === 'HOURS' ? 0.0 : null, type: value}) : day
+            (day, name, value) => name === "date" ? new WorkingDay({...day, date: value}) : day,
+            (day, name, value) => name === 'hours' ? this.calculPrices(day, value) : day,
+            (day, name, value) => name === 'taxFreePrice' ? this.calculPrices(day, null, day.type, value) : day,
+            (day, name, value) => name === 'type' ? this.calculPrices(day, value === 'HOURS' ? 0.0 : null, value) : day
         ];
         const data = this.state.data;
         const workingDays = data.workingDays.filter(d => d.id !== day.id);
@@ -164,21 +163,23 @@ class ConstructionSite extends Component{
 
     onConstructionSiteChange(name, value) {
         const data = this.state.data;
+        console.log(data);
         const constructionSiteInfo = data.constructionSiteInfo;
 
         if (name === 'client' || name === 'place') {
-            const newConstructionSiteInfo = {...constructionSiteInfo, [name]: value}
-            this.setState({data: {...data, constructionSiteInfo: newConstructionSiteInfo}});
+            const newData = name === 'place' ? data.updatePlace(value) : data.updateClient(value);
+            this.setState({data: newData});
         }
         else {
-            const rate = constructionSiteInfo.rate;
+            /*const rate = constructionSiteInfo.rate;
             const newRate = {...rate, [name]: parseFloat(value)};
             const newConstructionSiteInfo = {...constructionSiteInfo, rate: newRate};
 
             this.setState({data: {...data, constructionSiteInfo: newConstructionSiteInfo}}, () => {
-                const workingDays = this.state.data.workingDays.map(d => this.calculPrices(d))
+                const workingDays = this.state.data.workingDays.map(d => this.calculPrices(d, d.hours, d.type))
                 this.setState({data: {...this.state.data, workingDays: workingDays}});      
             });
+            */
         }
     }
 
@@ -187,7 +188,7 @@ class ConstructionSite extends Component{
         <table className="Construction-Site">
             <Info
                 clients={this.state.clients}
-                constructionSiteInfo={this.state.data.constructionSiteInfo}
+                constructionSiteInfo={this.state.data}
                 onConstructionSiteChange={this.onConstructionSiteChange}
             />
             <Days
@@ -219,18 +220,3 @@ class ConstructionSite extends Component{
         );
     }
 }
-
-function hoursPrice(hours, hourTaxFreePrice, tax) {
-    const hoursTaxFree = hourTaxFreePrice * 100;
-    const priceTaxFree = hoursTaxFree * hours;
-    const price = priceTaxFree + priceTaxFree * tax;
-    return {taxFreePrice: priceTaxFree / 100, price: price / 100}
-}
-
-function getPrice(taxFreePrice, tax){
-    const intTaxFreePrice = taxFreePrice * 100;
-    const price = intTaxFreePrice + intTaxFreePrice * tax;
-    return {taxFreePrice: taxFreePrice, price: price / 100};
-}
-
-export default ConstructionSite;
