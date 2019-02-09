@@ -60,6 +60,27 @@ export class ConstructionSite {
     updatePlace = (value) => this.updateConstructionSiteInfo({place: value})
     updateClient = (value) => this.updateConstructionSiteInfo({client: value})
 
+    addWorkingDay = (wd) => this.updateWorkingDay([...this.workingDays, wd]);
+    deleteWorkingDay = (id) => this.updateWorkingDay(this.workingDays.filter(wd => wd.id !== id));
+
+    updateHourPrice = (hourPrice) => {
+        const rate = new Rate({...this.constructionSiteInfo.rate, hourTaxFreePrice: hourPrice});
+        return this.updateConstructionSiteInfo({rate: rate});
+    }
+    updateDayPrice = (dayPrice) => {
+        const rate = new Rate({...this.constructionSiteInfo.rate, dayTaxFreePrice: dayPrice});
+        return this.updateConstructionSiteInfo({rate: rate});
+    }
+    updateTaxPercent = (taxPercent) => {
+        const rate = new Rate({...this.constructionSiteInfo.rate, taxPercent: taxPercent});
+        return this.updateConstructionSiteInfo({rate: rate});
+    }
+
+    computePrice(){
+        const cb = (wd) => WorkingDay.computePrice(wd, this.hourPrice, wd.taxFreePrice, this.taxPercent / 100);
+        return this.updateWorkingDay(this.workingDays.map(wd => cb(wd)));
+    }
+
     /*
     * Private
     */
@@ -67,6 +88,11 @@ export class ConstructionSite {
         const newConstructionSiteInfo = new ConstructionSiteInfo({...this.constructionSiteInfo, ...newData});
         return new ConstructionSite({id: this.id, constructionSiteInfo: newConstructionSiteInfo, workingDays: this.workingDays});
     }
+    updateWorkingDay = (workingDays) => new ConstructionSite({
+        id: this.id, 
+        constructionSiteInfo: this.constructionSiteInfo,
+        workingDays: workingDays
+    });
 }
 
 class ConstructionSiteInfo {
@@ -88,20 +114,43 @@ class Rate {
 export const WorkingDayType = Object.freeze({
     DAY: Symbol("DAY"),
     HOURS: Symbol("HOURS"),
-    TRANSFER: Symbol("TRANSFER")
+    TRANSFER: Symbol("TRANSFER"),
+
+    toString: (v) => {
+        if (v === WorkingDayType.DAY) return "DAY";
+        if (v === WorkingDayType.HOURS) return "HOURS";
+        if (v === WorkingDayType.TRANSFER) return "TRANSFER";
+        return null;
+    }
 });
 
 export class WorkingDay {
     constructor({id, date = null, type = null, taxFreePrice = null, price = null, hours = null}){
-        if (!WorkingDayType[type]){
+        const typeIsSymbol = typeof type === 'symbol';
+
+        if (!typeIsSymbol && !WorkingDayType[type]){
             throw new Error("Bad Symbol");
         }
         this.id = id;
         this.date = date;
-        this.type = type;
+        this.type = typeIsSymbol ? type : WorkingDayType[type];
         this.taxFreePrice = taxFreePrice;
         this.price = price;
         this.hours = hours;
+    }
+
+    static updateType(workingDay, type){
+        if (WorkingDayType[type] === WorkingDayType.HOURS){
+            return new WorkingDay({...workingDay, type: WorkingDayType.HOURS, hours: 0.0, taxFreePrice: 0.0, price: 0.0});
+        }
+        return new WorkingDay({...workingDay, type: type});
+    }
+
+    static computePrice(workingDay, hourTaxFreePrice, taxFreePrice, taxPercent){
+        if (workingDay.hours !== null){
+            return WorkingDay.updateHoursPrice(workingDay, workingDay.hours, hourTaxFreePrice, taxPercent);
+        }
+        return WorkingDay.updatePrice(workingDay, taxFreePrice, taxPercent);
     }
 
     static updateHoursPrice(workingDay, hours, hourTaxFreePrice, tax) {
@@ -109,16 +158,15 @@ export class WorkingDay {
         const priceTaxFree = hoursTaxFree * hours;
         const price = priceTaxFree + priceTaxFree * tax;
         return new WorkingDay({...workingDay,
-            ...{
-                taxFreePrice: priceTaxFree / 100,
-                price: price / 100,
-                hours: hours
-            }});
+            taxFreePrice: priceTaxFree / 100,
+            price: price / 100,
+            hours: hours
+        });
     }
     
     static updatePrice(workingDay, taxFreePrice, tax){
         const intTaxFreePrice = taxFreePrice * 100;
         const price = intTaxFreePrice + intTaxFreePrice * tax;
-        return new WorkingDay({...workingDay, ...{taxFreePrice: taxFreePrice, price: price / 100, hours: null}});
+        return new WorkingDay({...workingDay, taxFreePrice: taxFreePrice, price: Math.trunc(price) / 100, hours: null});
     }
 }

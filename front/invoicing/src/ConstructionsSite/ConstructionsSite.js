@@ -54,27 +54,21 @@ function RenderAll({data, onConstructionSiteSelect}) {
     );
 }
   
-export class ConstructionsSite extends Component {
-    constructor(props){
-      super(props);
-    }
-  
-    render() {
-      const data = this.props.data;
-  
-      return (
-        <table>
-          <GeneralInformation
-            onNewWorkDay={this.props.onNewWorkDay}
-            nbDaysWork={data.nbDaysWorked}
-            nbDaysWithHours={data.nbDaysWithHours}
-            nbTransfer={data.nbTransfer}
-          />
-          <RenderAll
-            data={data}
-            onConstructionSiteSelect={this.props.onConstructionSiteSelect}
-           />
-        </table>
-      );
-    }
+export function ConstructionsSite(props){
+  const data = props.data;
+
+  return (
+    <table>
+      <GeneralInformation
+        onNewWorkDay={props.onNewWorkDay}
+        nbDaysWork={data.nbDaysWorked}
+        nbDaysWithHours={data.nbDaysWithHours}
+        nbTransfer={data.nbTransfer}
+      />
+      <RenderAll
+        data={data}
+        onConstructionSiteSelect={props.onConstructionSiteSelect}
+        />
+    </table>
+  );
 }

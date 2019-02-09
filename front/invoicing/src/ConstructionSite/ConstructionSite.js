@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './ConstructionSite.css';
-import {WorkingDay, ConstructionSite as ConstructionSiteObj} from '../lib/ConstructionsSite';
+import {WorkingDayType, WorkingDay, ConstructionSite as ConstructionSiteObj, ConstructionsSite} from '../lib/ConstructionsSite';
 
 function Info(props){
     const info = props.constructionSiteInfo;
@@ -52,7 +52,7 @@ function Day(props){
         </td>
         <td>
             <p>
-            <select name="type" defaultValue={day.type} onChange={onDayChange}>
+            <select name="type" defaultValue={WorkingDayType.toString(day.type)} onChange={onDayChange}>
                 <option value="TRANSFER">Transfert</option>
                 <option value="DAY">Jour complet</option>
                 <option value="HOURS">Heures travaillé</option>
@@ -60,10 +60,10 @@ function Day(props){
             </p>
         </td>
         <td>
-            <p>{day.type === "HOURS" ? inputNumber("hours") : null}</p>
+            <p>{day.type === WorkingDayType.HOURS ? inputNumber("hours") : null}</p>
         </td>
         <td>
-            <p>{day.type === "TRANSFER" ? inputNumber("taxFreePrice") : day.taxFreePrice}</p>
+            <p>{day.type === WorkingDayType.TRANSFER ? inputNumber("taxFreePrice") : day.taxFreePrice}</p>
         </td>
         <td>
             <p>{day.price}</p>
@@ -80,7 +80,7 @@ function newDay(days){
     return {
         id: id,
         date: null,
-        type: "TRANSFER",
+        type: WorkingDayType.TRANSFER,
         taxFreePrice: null,
         price: null
     };
@@ -134,8 +134,9 @@ export class ConstructionSite extends Component{
         if (hours !== null) {
             return WorkingDay.updateHoursPrice(day, hours, data.hourPrice, tax);
         }
-        if (type === "TRANSFER") {
-            return WorkingDay.updatePrice(day, transferPrice ? transferPrice : day.dayPrice, tax);
+        if (type === WorkingDayType.TRANSFER || WorkingDayType[type] === WorkingDayType.TRANSFER) {
+            const _transferPrice = () => typeof transferPrice === "string" ? parseFloat(transferPrice) : transferPrice * 1.0;
+            return WorkingDay.updatePrice(day, transferPrice ? _transferPrice() : day.dayPrice, tax);
         }
         return WorkingDay.updatePrice(day, data.dayPrice, tax);
     }
@@ -143,15 +144,13 @@ export class ConstructionSite extends Component{
     onDayChange(day, name, value) {
         const dayChangeOperations = [
             (day, name, value) => name === "date" ? new WorkingDay({...day, date: value}) : day,
-            (day, name, value) => name === 'hours' ? this.calculPrices(day, value) : day,
-            (day, name, value) => name === 'taxFreePrice' ? this.calculPrices(day, null, day.type, value) : day,
-            (day, name, value) => name === 'type' ? this.calculPrices(day, value === 'HOURS' ? 0.0 : null, value) : day
+            (day, name, value) => name === "hours" ? this.calculPrices(day, value) : day,
+            (day, name, value) => name === "taxFreePrice" ? this.calculPrices(day, null, day.type, value) : day,
+            (day, name, value) => name === "type" ? WorkingDay.updateType(day, value) : day
         ];
         const data = this.state.data;
-        const workingDays = data.workingDays.filter(d => d.id !== day.id);
         const newWorkingDays = dayChangeOperations.reduce((d, fct) => fct(d, name, value), day);
-        const newData = {...data, workingDays: [...workingDays, newWorkingDays]}
-        this.setState({data: newData});
+        this.setState({data: data.deleteWorkingDay(day.id).addWorkingDay(newWorkingDays)});
     }
 
     deleteDay(day) {
@@ -163,23 +162,26 @@ export class ConstructionSite extends Component{
 
     onConstructionSiteChange(name, value) {
         const data = this.state.data;
-        console.log(data);
-        const constructionSiteInfo = data.constructionSiteInfo;
 
         if (name === 'client' || name === 'place') {
             const newData = name === 'place' ? data.updatePlace(value) : data.updateClient(value);
             this.setState({data: newData});
         }
         else {
-            /*const rate = constructionSiteInfo.rate;
-            const newRate = {...rate, [name]: parseFloat(value)};
-            const newConstructionSiteInfo = {...constructionSiteInfo, rate: newRate};
-
-            this.setState({data: {...data, constructionSiteInfo: newConstructionSiteInfo}}, () => {
-                const workingDays = this.state.data.workingDays.map(d => this.calculPrices(d, d.hours, d.type))
-                this.setState({data: {...this.state.data, workingDays: workingDays}});      
-            });
-            */
+            const _value = parseFloat(value);
+            let newData = null;
+            switch (name){
+                case 'hourPrice':
+                    newData = data.updateHourPrice(_value);
+                    break;
+                case 'dayPrice':
+                    newData = data.updateDayPrice(_value);
+                    break;
+                case 'taxPercent':
+                    newData = data.updateTaxPercent(_value);
+                    break;
+            }
+            this.setState({data: newData.computePrice()});
         }
     }
 
