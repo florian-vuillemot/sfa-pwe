@@ -96,7 +96,7 @@ class App extends Component {
   }
 
   constructionSiteUpdate(day) {
-    const newData = [...this.state.data.filter(d => d.id !== day.id), day];
+    const newData = new ConstructionsSite([...this.state.data.filter(d => d.id !== day.id), day]);
     this.setState({
       data: newData,
       onNewWorkDay: false,
@@ -106,7 +106,7 @@ class App extends Component {
   }
 
   deleteConstructionSite(constructionSiteId) {
-    const newData = this.state.data.filter(d => d.id !== constructionSiteId);
+    const newData = new ConstructionsSite(this.state.data.filter(d => d.id !== constructionSiteId));
     this.setState({
       data: newData,
       onNewWorkDay: false,
