@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import './ConstructionsSite.css';
   
-function GeneralInformation({nbDaysWork, nbTransfer, nbDaysWithHours, onNewWorkDay}) {
+function GeneralInformation({nbDaysWork, nbTransfer, nbDaysWithHours, onNewConstructionSite}) {
     return (
       <thead>
         <tr>
           <th>Nombreux de jour complet: {nbDaysWork}</th>
           <th></th>
           <th rowSpan="3" colSpan="4">
-            <button onClick={onNewWorkDay}>
+            <button onClick={onNewConstructionSite}>
               Ajouter un chantier
             </button>
           </th>
@@ -61,7 +61,7 @@ export function ConstructionsSite(props){
   return (
     <table>
       <GeneralInformation
-        onNewWorkDay={props.onNewWorkDay}
+        onNewConstructionSite={props.onNewConstructionSite}
         nbDaysWork={data.nbDaysWorked}
         nbDaysWithHours={data.nbDaysWithHours}
         nbTransfer={data.nbTransfer}

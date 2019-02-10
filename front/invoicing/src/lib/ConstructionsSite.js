@@ -22,13 +22,13 @@ export class ConstructionsSite {
 }
 
 export class ConstructionSite {
-    constructor({id, constructionSiteInfo = null, workingDays = null}) {
+    constructor({id, constructionSiteInfo = null, workingDays = []}) {
         this.id = id;
         this.constructionSiteInfo = new ConstructionSiteInfo(constructionSiteInfo);
         this.workingDays = workingDays.map(wd => new WorkingDay(wd));
     }
 
-    static template(constructionsSite) {
+    static factory(constructionsSite) {
         const greatId = constructionsSite.length ? constructionsSite.sort((c1, c2) => c1.id < c2.id)[0] : null;
         const id = greatId ? greatId.id + 1 : 0;
         const rate = greatId ? greatId.constructionSiteInfo.rate : {};
@@ -37,11 +37,9 @@ export class ConstructionSite {
             place: null,
             rate: rate
         });
-        
         return new ConstructionSite({
             id: id,
-            constructionSiteInfo: constructionSiteInfo,
-            workingDays: []
+            constructionSiteInfo: constructionSiteInfo
         });
     }
 

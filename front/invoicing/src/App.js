@@ -65,24 +65,27 @@ class App extends Component {
     const data = GetConstructionsSite();
     
     this.state = {
-      onNewWorkDay: false,
+      onNewConstructionSite: false,
       constructionSiteSelect: false,
       data: data,
       constructionSite: this.constructionSiteTemplate(data)
     };
 
-    this.newWorkDay = this.newWorkDay.bind(this);
+    this.newContructionSite = this.newContructionSite.bind(this);
     this.constructionSiteSelect = this.constructionSiteSelect.bind(this);
     this.constructionSiteUpdate = this.constructionSiteUpdate.bind(this);
     this.constructionSiteTemplate = this.constructionSiteTemplate.bind(this);
     this.deleteConstructionSite = this.deleteConstructionSite.bind(this);
   }
 
-  constructionSiteTemplate = (data = null) => ConstructionSite.template(data ? data : this.state.data);
+  constructionSiteTemplate(data = null) {
+    const _data = data ? data : this.state.data;
+    return ConstructionSite.factory(_data.constructionsSite ? _data.constructionsSite : []);
+  }
 
-  newWorkDay(){
+  newContructionSite(){
     this.setState({
-      onNewWorkDay: true,
+      onNewConstructionSite: true,
       constructionSite: this.constructionSiteTemplate(),
       constructionSiteSelect: false
     })
@@ -99,7 +102,7 @@ class App extends Component {
     const newData = new ConstructionsSite([...this.state.data.filter(d => d.id !== day.id), day]);
     this.setState({
       data: newData,
-      onNewWorkDay: false,
+      onNewConstructionSite: false,
       constructionSiteSelect: false,
       constructionSite: null
     });
@@ -109,7 +112,7 @@ class App extends Component {
     const newData = new ConstructionsSite(this.state.data.filter(d => d.id !== constructionSiteId));
     this.setState({
       data: newData,
-      onNewWorkDay: false,
+      onNewConstructionSite: false,
       constructionSiteSelect: false,
       constructionSite: null
     });
@@ -120,7 +123,7 @@ class App extends Component {
       <div className="App">
         <p>Menu principal</p>
         <header className="App-header">
-          {this.state.onNewWorkDay || this.state.constructionSiteSelect ?
+          {this.state.onNewConstructionSite || this.state.constructionSiteSelect ?
             <ConstructionSiteView
               constructionSite={this.state.constructionSite}
               onUpdate={this.constructionSiteUpdate}
@@ -128,7 +131,7 @@ class App extends Component {
             />
             : <ConstructionsSiteView
                 data={this.state.data}
-                onNewWorkDay={this.newWorkDay}
+                onNewConstructionSite={this.newContructionSite}
                 onConstructionSiteSelect={this.constructionSiteSelect}
               />
           }
