@@ -149,7 +149,7 @@ class App extends Component {
     });
   }
 
-  updateClient = (clients) => this.setState({clients: clients});
+  updateClients = (clients) => this.setState({clients: clients});
 
   render() {
     return (
@@ -162,12 +162,12 @@ class App extends Component {
               constructionSite={this.state.constructionSite}
               onUpdate={this.constructionSiteUpdate}
               onDeleteConstructionSite={this.deleteConstructionSite}
+              onUpdateClients={this.updateClients}
             />
             : <ConstructionsSiteView
                 data={this.state.data}
                 onNewConstructionSite={this.newContructionSite}
                 onConstructionSiteSelect={this.constructionSiteSelect}
-                onClientUpdate={this.updateClient}
               />
           }
         </header>

@@ -128,7 +128,7 @@ function ValidateOrDelete(props){
                 <td colSpan="6">
                     <button
                         onClick={
-                            () => window.confirm('Voulez-vous vraiment supprimer ce chantier ?') ? props.onDelete : null
+                            () => window.confirm('Voulez-vous vraiment supprimer ce chantier ?') ? props.onDelete() : null
                         }
                     >
                         Supprimer
@@ -222,7 +222,8 @@ export class ConstructionSite extends Component{
             clients: this.state.clients.add(client),
             data: this.state.data.updateClient(client.name),
             createClient: false
-        });
+        }, () => this.props.onUpdateClients(this.state.clients));
+        
     }
     cancelNewClient() {
         this.setState({
