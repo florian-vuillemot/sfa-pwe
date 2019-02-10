@@ -9,9 +9,11 @@ function Info(props){
     const onConstructionSiteChange = (e) => props.onConstructionSiteChange(e.target.name, e.target.value);
     const onClientBlur = (e) => {
         if (props.clients.find(e.target.value) === undefined){
-            
+            props.createClient()
         }
-        props.onConstructionSiteChange(e.target.name, e.target.value);
+        else {
+            props.onConstructionSiteChange(e.target.name, e.target.value);
+        }
     };
     const inputNumber = (name, value, text, colSpan) => {
       return (
@@ -143,12 +145,16 @@ export class ConstructionSite extends Component{
 
         this.state = {
             clients: props.clients,
-            data: props.constructionSite
+            data: props.constructionSite,
+            createClient: false
         };
 
         this.onDayChange = this.onDayChange.bind(this);
         this.deleteDay = this.deleteDay.bind(this);
         this.onConstructionSiteChange = this.onConstructionSiteChange.bind(this);
+        this.createClient = this.createClient.bind(this);
+        this.createNewClient = this.createNewClient.bind(this);
+        this.cancelNewClient = this.cancelNewClient.bind(this);
     }
 
     calculPrices(day, hours = null, type = null, transferPrice = null) {
@@ -205,11 +211,36 @@ export class ConstructionSite extends Component{
             this.setState({data: newData.computePrice()});
         }
     }
+    
+    createClient(){
+        this.setState({
+            createClient: true
+        });
+    }
+    createNewClient(client){
+        this.setState({
+            clients: this.state.clients.add(client),
+            data: this.state.data.updateClient(client.name),
+            createClient: false
+        });
+        console.log(this.state.clients)
+        console.log(this.state.clients.add(client))
+    }
+    cancelNewClient() {
+        this.setState({
+            createClient: false
+        });
+    }
 
     render() {
-        return (
-            <Client />
-        );
+        if (this.state.createClient){
+            return (
+                <Client 
+                    onCancel={this.cancelNewClient}
+                    onCreateClient={this.createNewClient}
+                />
+            );
+        }
         return (
             <table className="Construction-Site">
                 <Info
@@ -217,6 +248,7 @@ export class ConstructionSite extends Component{
                     constructionSiteInfo={this.state.data}
                     onConstructionSiteChange={this.onConstructionSiteChange}
                     onClientUpdate={this.props.onClientUpdate}
+                    createClient={this.createClient}
                 />
                 <Days
                     days={this.state.data.workingDays}

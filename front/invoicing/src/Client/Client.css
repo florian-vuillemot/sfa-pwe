@@ -18,7 +18,6 @@
 }
 
 .Client-Information > tbody > tr > td > input {
-    width: 90%;
     height: 35px;
     text-align: center;
     margin: 2px;
@@ -47,4 +46,15 @@
 .Client-Information > tbody > tr:nth-child(3) > td:last-child > input {
     text-align: left;
     width: 450px;
+}
+
+.Client-Information > tfoot > tr > td:last-child {
+    text-align: right;
+}
+.Client-Information > tfoot > tr > td:last-child > button {
+    margin-right: 5px;
+    width: 470px;
+}
+.Client-Information > tfoot > tr > td:last-child > button:hover {
+    background-color: lightgreen;
 }
