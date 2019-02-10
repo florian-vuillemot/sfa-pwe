@@ -29,9 +29,9 @@ export class ConstructionSite {
     }
 
     static factory(constructionsSite) {
-        const greatId = constructionsSite.length ? constructionsSite.sort((c1, c2) => c1.id < c2.id)[0] : null;
-        const id = greatId ? greatId.id + 1 : 0;
-        const rate = greatId ? greatId.constructionSiteInfo.rate : {};
+        const maxId = constructionsSite.length ? constructionsSite.sort((c1, c2) => c1.id < c2.id)[0] : null;
+        const id = maxId ? maxId.id + 1 : 0;
+        const rate = maxId ? maxId.constructionSiteInfo.rate : {};
         const constructionSiteInfo = new ConstructionSiteInfo({
             client: null,
             place: null,
@@ -142,8 +142,8 @@ export class WorkingDay {
     }
 
     static factory(workingsDay, args = {}) {
-        const greatId = workingsDay.length ? workingsDay.sort((c1, c2) => c1.id < c2.id)[0].id + 1 : 0;
-        return new WorkingDay({id: greatId, ...args});
+        const maxId = workingsDay.length ? workingsDay.sort((c1, c2) => c1.id < c2.id)[0].id + 1 : 0;
+        return new WorkingDay({id: maxId, ...args});
     }
 
     static updateType(workingDay, type){

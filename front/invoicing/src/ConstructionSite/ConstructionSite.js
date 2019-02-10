@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
 import './ConstructionSite.css';
 import {WorkingDayType, WorkingDay} from '../lib/ConstructionsSite';
+import {Client} from '../Client/Client';
 
 function Info(props){
     const info = props.constructionSiteInfo;
   
     const onConstructionSiteChange = (e) => props.onConstructionSiteChange(e.target.name, e.target.value);
+    const onClientBlur = (e) => {
+        if (props.clients.find(e.target.value) === undefined){
+            
+        }
+        props.onConstructionSiteChange(e.target.name, e.target.value);
+    };
     const inputNumber = (name, value, text, colSpan) => {
       return (
         <th colSpan={colSpan}>
@@ -20,8 +27,8 @@ function Info(props){
         <tr>
           <th>
             <label forhtml="client">Client </label>
-            <input name="client" list="clients" defaultValue={info.client} onChange={onConstructionSiteChange} onBlur={onConstructionSiteChange}/>
-            <datalist id="clients">{props.clients.map(c => <option value={c} key={c}/>)}</datalist>
+            <input name="client" list="clients" defaultValue={info.client} onChange={onConstructionSiteChange} onBlur={onClientBlur}/>
+            <datalist id="clients">{props.clients.clientsName.map(c => <option value={c} key={c}/>)}</datalist>
           </th>
           {inputNumber("hourPrice", info.hourPrice, "Prix horaire HT ", 5)}
         </tr>
@@ -105,12 +112,37 @@ function Days(props){
     )
 }
 
+function ValidateOrDelete(props){
+    return (
+        <tfoot>
+            <tr>
+                <td colSpan="6">
+                    <button onClick={props.onValidate}>
+                        Valider
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td colSpan="6">
+                    <button
+                        onClick={
+                            () => window.confirm('Voulez-vous vraiment supprimer ce chantier ?') ? props.onDelete : null
+                        }
+                    >
+                        Supprimer
+                    </button>
+                </td>
+            </tr>
+        </tfoot>
+    );
+}
+
 export class ConstructionSite extends Component{
     constructor(props){
         super(props);
 
         this.state = {
-            clients: ["Eurovia", "Gille", "Paul"],
+            clients: props.clients,
             data: props.constructionSite
         };
 
@@ -176,38 +208,26 @@ export class ConstructionSite extends Component{
 
     render() {
         return (
-        <table className="Construction-Site">
-            <Info
-                clients={this.state.clients}
-                constructionSiteInfo={this.state.data}
-                onConstructionSiteChange={this.onConstructionSiteChange}
-            />
-            <Days
-                days={this.state.data.workingDays}
-                onDayChange={this.onDayChange}
-                deleteDay={this.deleteDay}
-            />
-            <tfoot>
-                <tr>
-                    <td colSpan="6">
-                        <button onClick={() => this.props.onUpdate(this.state.data)}>
-                            Valider
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td colSpan="6">
-                        <button
-                            onClick={
-                                () => window.confirm('Voulez-vous vraiment supprimer ce chantier ?') ? this.props.onDeleteConstructionSite(this.state.data.id) : null
-                            }
-                        >
-                            Supprimer
-                        </button>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
+            <Client />
+        );
+        return (
+            <table className="Construction-Site">
+                <Info
+                    clients={this.state.clients}
+                    constructionSiteInfo={this.state.data}
+                    onConstructionSiteChange={this.onConstructionSiteChange}
+                    onClientUpdate={this.props.onClientUpdate}
+                />
+                <Days
+                    days={this.state.data.workingDays}
+                    onDayChange={this.onDayChange}
+                    deleteDay={this.deleteDay}
+                />
+                <ValidateOrDelete
+                    onValidate={() => this.props.onUpdate(this.state.data)}
+                    onDelete={() => this.props.onDeleteConstructionSite(this.state.data.id)}
+                />
+            </table>
         );
     }
 }

@@ -3,6 +3,7 @@ import './App.css';
 import {ConstructionSite as ConstructionSiteView} from './ConstructionSite/ConstructionSite';
 import {ConstructionsSite as ConstructionsSiteView} from './ConstructionsSite/ConstructionsSite';
 import {ConstructionsSite, ConstructionSite} from './lib/ConstructionsSite';
+import { Clients } from './lib/Client';
 
 function GetConstructionsSite() {
   const data = [
@@ -58,6 +59,35 @@ function GetConstructionsSite() {
   return new ConstructionsSite(data);
 }
 
+function GetClients(){
+  const clients = [
+    {
+      name: "Eurovia",
+      number: 21,
+      street: "my street",
+      city: "St Martin",
+      postalCode: "34380",
+      additionalAddressDetails: "CEDEX 15"
+    },
+    {
+      name: "Gille",
+      number: 42,
+      street: "Cade",
+      city: "Mtp",
+      postalCode: "34000"
+    },
+    {
+      name: "Paul",
+      number: 84,
+      street: "St Michel",
+      city: "Paris",
+      postalCode: "01"
+    }
+  ]
+
+  return new Clients(clients);
+}
+
 class App extends Component {
   constructor(props){
     super(props);
@@ -68,7 +98,8 @@ class App extends Component {
       onNewConstructionSite: false,
       constructionSiteSelect: false,
       data: data,
-      constructionSite: this.constructionSiteTemplate(data)
+      constructionSite: this.constructionSiteTemplate(data),
+      clients: GetClients()
     };
 
     this.newContructionSite = this.newContructionSite.bind(this);
@@ -118,6 +149,8 @@ class App extends Component {
     });
   }
 
+  updateClient = (clients) => this.setState({clients: clients});
+
   render() {
     return (
       <div className="App">
@@ -125,6 +158,7 @@ class App extends Component {
         <header className="App-header">
           {this.state.onNewConstructionSite || this.state.constructionSiteSelect ?
             <ConstructionSiteView
+              clients={this.state.clients}
               constructionSite={this.state.constructionSite}
               onUpdate={this.constructionSiteUpdate}
               onDeleteConstructionSite={this.deleteConstructionSite}
@@ -133,6 +167,7 @@ class App extends Component {
                 data={this.state.data}
                 onNewConstructionSite={this.newContructionSite}
                 onConstructionSiteSelect={this.constructionSiteSelect}
+                onClientUpdate={this.updateClient}
               />
           }
         </header>

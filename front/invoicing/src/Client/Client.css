@@ -1,0 +1,50 @@
+.Client-Information {
+    width: 550px;
+    border: 2px solid white;
+    border-radius: 25px;
+    padding: 30px;
+}
+
+.Client-Information > thead > tr > td {
+    text-align: center;
+    font-size: 2em;
+}
+
+.Client-Information > tbody > tr > td:first-child {
+    text-align: right;
+}
+.Client-Information > tbody > tr > td:last-child {
+    text-align: left;
+}
+
+.Client-Information > tbody > tr > td > input {
+    width: 90%;
+    height: 35px;
+    text-align: center;
+    margin: 2px;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.Client-Information > tbody > tr:first-child > td > input {
+    width: 562px;
+}
+.Client-Information > tbody > tr:last-child > td > input {
+    width: 562px;
+}
+.Client-Information > tbody > tr:nth-child(2) > td:first-child > input {
+    text-align: left;
+    width: 80px;
+}
+.Client-Information > tbody > tr:nth-child(2) > td:last-child > input {
+    text-align: left;
+    width: 450px;
+}
+.Client-Information > tbody > tr:nth-child(3) > td:first-child > input {
+    text-align: left;
+    width: 80px;
+}
+.Client-Information > tbody > tr:nth-child(3) > td:last-child > input {
+    text-align: left;
+    width: 450px;
+}
