@@ -18,6 +18,7 @@ export class ConstructionsSite {
 
     map = (f) => this.constructionsSite.map(f);
     filter = (f) => this.constructionsSite.filter(f);
+    sort = (f) => this.constructionsSite.sort(f);
 }
 
 export class ConstructionSite {
@@ -77,7 +78,7 @@ export class ConstructionSite {
     }
 
     computePrice(){
-        const cb = (wd) => WorkingDay.computePrice(wd, this.hourPrice, wd.taxFreePrice, this.taxPercent / 100);
+        const cb = (wd) => WorkingDay.computePrice(wd, this.hourPrice, wd.taxFreePrice, this.dayPrice, this.taxPercent / 100);
         return this.updateWorkingDay(this.workingDays.map(wd => cb(wd)));
     }
 
@@ -112,11 +113,13 @@ class Rate {
 }
 
 export const WorkingDayType = Object.freeze({
+    null: Symbol(null),
     DAY: Symbol("DAY"),
     HOURS: Symbol("HOURS"),
     TRANSFER: Symbol("TRANSFER"),
 
     toString: (v) => {
+        if (v === WorkingDayType.null) return "";
         if (v === WorkingDayType.DAY) return "DAY";
         if (v === WorkingDayType.HOURS) return "HOURS";
         if (v === WorkingDayType.TRANSFER) return "TRANSFER";
@@ -128,7 +131,7 @@ export class WorkingDay {
     constructor({id, date = null, type = null, taxFreePrice = null, price = null, hours = null}){
         const typeIsSymbol = typeof type === 'symbol';
 
-        if (!typeIsSymbol && !WorkingDayType[type]){
+        if (type && !typeIsSymbol && !WorkingDayType[type]){
             throw new Error("Bad Symbol");
         }
         this.id = id;
@@ -139,25 +142,32 @@ export class WorkingDay {
         this.hours = hours;
     }
 
+    static factory(workingsDay, args = {}) {
+        const greatId = workingsDay.length ? workingsDay.sort((c1, c2) => c1.id < c2.id)[0].id + 1 : 0;
+        return new WorkingDay({id: greatId, ...args});
+    }
+
     static updateType(workingDay, type){
         if (WorkingDayType[type] === WorkingDayType.HOURS){
             return new WorkingDay({...workingDay, type: WorkingDayType.HOURS, hours: 0.0, taxFreePrice: 0.0, price: 0.0});
         }
-        return new WorkingDay({...workingDay, type: type});
+        return WorkingDay.updatePrice(new WorkingDay({...workingDay, type: type}));
     }
 
-    static computePrice(workingDay, hourTaxFreePrice, taxFreePrice, taxPercent){
+    static computePrice(workingDay, hourTaxFreePrice, customTaxFreePrice, dayTaxFreePrice, taxPercent){
         if (workingDay.hours !== null){
             return WorkingDay.updateHoursPrice(workingDay, workingDay.hours, hourTaxFreePrice, taxPercent);
         }
-        return WorkingDay.updatePrice(workingDay, taxFreePrice, taxPercent);
+        const price = workingDay.type === WorkingDayType.DAY ? dayTaxFreePrice : customTaxFreePrice;
+        return WorkingDay.updatePrice(workingDay, price, taxPercent);
     }
 
     static updateHoursPrice(workingDay, hours, hourTaxFreePrice, tax) {
         const hoursTaxFree = hourTaxFreePrice * 100;
         const priceTaxFree = hoursTaxFree * hours;
         const price = priceTaxFree + priceTaxFree * tax;
-        return new WorkingDay({...workingDay,
+        return new WorkingDay({
+            ...workingDay,
             taxFreePrice: priceTaxFree / 100,
             price: price / 100,
             hours: hours

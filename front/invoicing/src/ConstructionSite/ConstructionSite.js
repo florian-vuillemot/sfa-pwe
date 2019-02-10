@@ -53,8 +53,9 @@ function Day(props){
         <td>
             <p>
             <select name="type" defaultValue={WorkingDayType.toString(day.type)} onChange={onDayChange}>
-                <option value="TRANSFER">Transfert</option>
+                <option disabled value="">-- Type --</option>
                 <option value="DAY">Jour complet</option>
+                <option value="TRANSFER">Transfert</option>
                 <option value="HOURS">Heures travaillé</option>
             </select>
             </p>
@@ -75,26 +76,18 @@ function Day(props){
     );
 }
 
-function newDay(days){
-    const id = days.length ? days.sort((d1, d2) => d1.id < d2.id)[0].id + 1 : 0;
-    return {
-        id: id,
-        date: null,
-        type: WorkingDayType.TRANSFER,
-        taxFreePrice: null,
-        price: null
-    };
-}
-
 function Days(props){
     const daysSorted = props.days.sort((d1, d2) => d1.date ? d1.date < d2.date : true);
     const days = daysSorted.map(d => <Day day={d} key={d.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/>)
 
     const newDayNeed = (daysSorted) => {
         const len = daysSorted.length;
-        const day = newDay(daysSorted);
         const createDay = len === 0 || !daysSorted.find(d => !d.date);
-        return createDay ? <Day day={day} key={day.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/> : null;
+        if (createDay){
+            const day = WorkingDay.factory(props.days);
+            return <Day day={day} key={day.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/>;
+        }
+        return null;
     };
 
     return (
@@ -148,9 +141,9 @@ export class ConstructionSite extends Component{
             (day, name, value) => name === "taxFreePrice" ? this.calculPrices(day, null, day.type, value) : day,
             (day, name, value) => name === "type" ? WorkingDay.updateType(day, value) : day
         ];
-        const data = this.state.data;
-        const newWorkingDays = dayChangeOperations.reduce((d, fct) => fct(d, name, value), day);
-        this.setState({data: data.deleteWorkingDay(day.id).addWorkingDay(newWorkingDays)});
+        const newWorkingDay = dayChangeOperations.reduce((d, fct) => fct(d, name, value), day);
+        this.setState({
+            data: this.state.data.deleteWorkingDay(day.id).addWorkingDay(newWorkingDay).computePrice()});
     }
 
     deleteDay(day) {

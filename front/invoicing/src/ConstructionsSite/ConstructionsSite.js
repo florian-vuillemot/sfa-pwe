@@ -26,7 +26,8 @@ function GeneralInformation({nbDaysWork, nbTransfer, nbDaysWithHours, onNewWorkD
 }
   
 function RenderAll({data, onConstructionSiteSelect}) {
-    const constructionsSite = data.map(d => {
+    const constructionsSiteSort = data.sort((cs1, cs2) => cs1.price < cs2.price);
+    const constructionsSiteRender = constructionsSiteSort.map(d => {
       return (
         <tr key={d.id} onClick={() => onConstructionSiteSelect(d)}>
           <td>{d.client}</td>
@@ -49,7 +50,7 @@ function RenderAll({data, onConstructionSiteSelect}) {
           <th>Jour partiel</th>
           <th>Prix TTC</th>
         </tr>
-        {constructionsSite}
+        {constructionsSiteRender}
       </tbody>
     );
 }
