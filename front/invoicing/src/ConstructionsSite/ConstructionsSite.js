@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './ConstructionsSite.css';
   
 function GeneralInformation({nbDaysWork, nbTransfer, nbDaysWithHours, onNewConstructionSite}) {

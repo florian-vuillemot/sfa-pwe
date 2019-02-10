@@ -80,6 +80,12 @@ export class ConstructionSite {
         return this.updateWorkingDay(this.workingDays.map(wd => cb(wd)));
     }
 
+    updateWorkingDay = (workingDays) => new ConstructionSite({
+        id: this.id, 
+        constructionSiteInfo: this.constructionSiteInfo,
+        workingDays: workingDays
+    });
+
     /*
     * Private
     */
@@ -87,11 +93,6 @@ export class ConstructionSite {
         const newConstructionSiteInfo = new ConstructionSiteInfo({...this.constructionSiteInfo, ...newData});
         return new ConstructionSite({id: this.id, constructionSiteInfo: newConstructionSiteInfo, workingDays: this.workingDays});
     }
-    updateWorkingDay = (workingDays) => new ConstructionSite({
-        id: this.id, 
-        constructionSiteInfo: this.constructionSiteInfo,
-        workingDays: workingDays
-    });
 }
 
 class ConstructionSiteInfo {

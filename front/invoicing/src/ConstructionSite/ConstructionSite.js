@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './ConstructionSite.css';
-import {WorkingDayType, WorkingDay, ConstructionSite as ConstructionSiteObj, ConstructionsSite} from '../lib/ConstructionsSite';
+import {WorkingDayType, WorkingDay} from '../lib/ConstructionsSite';
 
 function Info(props){
     const info = props.constructionSiteInfo;
@@ -47,31 +47,31 @@ function Day(props){
 
     return (
         <tr>
-        <td>
-            <input type="date" name="date" defaultValue={day.date} onChange={onDayChange}/>
-        </td>
-        <td>
-            <p>
-            <select name="type" defaultValue={WorkingDayType.toString(day.type)} onChange={onDayChange}>
-                <option disabled value="">-- Type --</option>
-                <option value="DAY">Jour complet</option>
-                <option value="TRANSFER">Transfert</option>
-                <option value="HOURS">Heures travaillé</option>
-            </select>
-            </p>
-        </td>
-        <td>
-            <p>{day.type === WorkingDayType.HOURS ? inputNumber("hours") : null}</p>
-        </td>
-        <td>
-            <p>{day.type === WorkingDayType.TRANSFER ? inputNumber("taxFreePrice") : day.taxFreePrice}</p>
-        </td>
-        <td>
-            <p>{day.price}</p>
-        </td>
-        <td>
-            <i className="fa fa-trash" onClick={() => props.deleteDay(day)}></i>
-        </td>
+            <td>
+                <input type="date" name="date" defaultValue={day.date} onChange={onDayChange}/>
+            </td>
+            <td>
+                <p>
+                    <select name="type" defaultValue={WorkingDayType.toString(day.type)} onChange={onDayChange}>
+                        <option disabled value="">-- Type --</option>
+                        <option value="DAY">Jour complet</option>
+                        <option value="TRANSFER">Transfert</option>
+                        <option value="HOURS">Heures travaillé</option>
+                    </select>
+                </p>
+            </td>
+            <td>
+                <p>{day.type === WorkingDayType.HOURS ? inputNumber("hours") : null}</p>
+            </td>
+            <td>
+                <p>{day.type === WorkingDayType.TRANSFER ? inputNumber("taxFreePrice") : day.taxFreePrice}</p>
+            </td>
+            <td>
+                <p>{day.price}</p>
+            </td>
+            <td>
+                <i className="fa fa-trash" onClick={() => props.deleteDay(day)}></i>
+            </td>
         </tr>
     );
 }
@@ -81,8 +81,7 @@ function Days(props){
     const days = daysSorted.map(d => <Day day={d} key={d.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/>)
 
     const newDayNeed = (daysSorted) => {
-        const len = daysSorted.length;
-        const createDay = len === 0 || !daysSorted.find(d => !d.date);
+        const createDay = daysSorted.length === 0 || !daysSorted.find(d => !d.date);
         if (createDay){
             const day = WorkingDay.factory(props.days);
             return <Day day={day} key={day.id} onDayChange={props.onDayChange} deleteDay={props.deleteDay}/>;
@@ -92,16 +91,16 @@ function Days(props){
 
     return (
         <tbody>
-        <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Heures</th>
-            <th>Prix HT</th>
-            <th>Prix TTC</th>
-            <th></th>
-        </tr>
-        {days}
-        {newDayNeed(daysSorted)}
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Heures</th>
+                <th>Prix HT</th>
+                <th>Prix TTC</th>
+                <th></th>
+            </tr>
+            {days}
+            {newDayNeed(daysSorted)}
         </tbody>
     )
 }
@@ -146,12 +145,7 @@ export class ConstructionSite extends Component{
             data: this.state.data.deleteWorkingDay(day.id).addWorkingDay(newWorkingDay).computePrice()});
     }
 
-    deleteDay(day) {
-        const data = this.state.data;
-        const workingDays = data.workingDays.filter(d => d.id !== day.id);
-        const newData = {...data, workingDays: workingDays}
-        this.setState({data: newData});
-    }
+    deleteDay = (day) => this.setState({data: this.state.data.deleteWorkingDay(day.id)});
 
     onConstructionSiteChange(name, value) {
         const data = this.state.data;
@@ -173,6 +167,8 @@ export class ConstructionSite extends Component{
                 case 'taxPercent':
                     newData = data.updateTaxPercent(_value);
                     break;
+                default:
+                    throw Error('Bad construction site type');
             }
             this.setState({data: newData.computePrice()});
         }
