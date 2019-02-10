@@ -115,11 +115,20 @@ function Days(props){
 }
 
 function ValidateOrDelete(props){
+    const onValidate = () => {
+        if (props.clients.clientsName.includes(props.client)){
+            props.onValidate();
+        }
+        else {
+            alert('Impossible de valider le chantier sans les informations sur le client');
+        }
+
+    }
     return (
         <tfoot>
             <tr>
                 <td colSpan="6">
-                    <button onClick={props.onValidate}>
+                    <button onClick={onValidate}>
                         Valider
                     </button>
                 </td>
@@ -256,6 +265,8 @@ export class ConstructionSite extends Component{
                     deleteDay={this.deleteDay}
                 />
                 <ValidateOrDelete
+                    client={this.state.data.client}
+                    clients={this.state.clients}
                     onValidate={() => this.props.onUpdate(this.state.data)}
                     onDelete={() => this.props.onDeleteConstructionSite(this.state.data.id)}
                 />
