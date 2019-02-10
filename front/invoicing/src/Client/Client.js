@@ -6,8 +6,9 @@ export class Client extends Component {
     constructor(props){
         super(props);
 
+        const name = props.name ? props.name : undefined;
         this.state = {
-            client: props.client ? props.client : new ClientObj({id: -1})
+            client: props.client ? props.client : new ClientObj({id: -1, name: name})
         }
     }
 
@@ -32,28 +33,46 @@ export class Client extends Component {
                 <tbody>
                     <tr>
                         <td colSpan="2">
-                            <input type="text" name="name" placeholder="Nom" onChange={onChange}/>
+                            <input
+                                type="text" name="name"
+                                defaultValue={this.state.client.name}
+                                placeholder="Nom" onChange={onChange}/>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <input type="number" name="number" placeholder="Numéro" onChange={onChange}/>
+                            <input
+                                type="number" name="number"
+                                defaultValue={this.state.client.number}
+                                placeholder="Numéro" onChange={onChange}/>
                         </td>
                         <td>
-                            <input type="text" name="street" placeholder="Rue" onChange={onChange}/>
+                            <input
+                                type="text" name="street"
+                                defaultValue={this.state.client.street}
+                                placeholder="Rue" onChange={onChange}/>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <input type="text" name="postalCode" placeholder="Code postal" onChange={onChange}/>
+                            <input
+                                type="text" name="postalCode"
+                                defaultValue={this.state.client.postalCode}
+                                placeholder="Code postal" onChange={onChange}/>
                         </td>
                         <td>
-                            <input type="text" name="city" placeholder="Ville" onChange={onChange}/>
+                            <input
+                                type="text" name="city"
+                                defaultValue={this.state.client.city}
+                                placeholder="Ville" onChange={onChange}/>
                         </td>
                     </tr>
                     <tr>
                         <td colSpan="2">
-                            <input type="text" name="additionalAddressDetails" placeholder="Complément d'adresse" onChange={onChange}/>
+                            <input
+                                type="text" name="additionalAddressDetails"
+                                defaultValue={this.state.client.additionalAddressDetails}
+                                placeholder="Complément d'adresse" onChange={onChange}/>
                         </td>
                     </tr>
                 </tbody>

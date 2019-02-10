@@ -223,8 +223,6 @@ export class ConstructionSite extends Component{
             data: this.state.data.updateClient(client.name),
             createClient: false
         });
-        console.log(this.state.clients)
-        console.log(this.state.clients.add(client))
     }
     cancelNewClient() {
         this.setState({
@@ -238,6 +236,7 @@ export class ConstructionSite extends Component{
                 <Client 
                     onCancel={this.cancelNewClient}
                     onCreateClient={this.createNewClient}
+                    name={this.state.data.constructionSiteInfo.client}
                 />
             );
         }
