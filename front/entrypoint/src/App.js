@@ -28,7 +28,6 @@ class App extends Component {
       year: year,
       strMonth: strMonth
     });
-    console.log(year, strMonth);
   }
 
   getBalise(){
@@ -36,7 +35,7 @@ class App extends Component {
       return <Calendar onClick={this.handleClick} />
     }
     return <SelectionAccountingInvoicing
-                isInvoicing={() => console.log("invoice")}
+                isInvoicing={() => window.location.href = this.props.conf.invoicingUrl}
                 isAccounting={() => console.log("account")}
                 back={() => this.clear()}
             />
