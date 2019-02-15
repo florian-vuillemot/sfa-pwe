@@ -154,7 +154,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <p>Menu principal</p>
+        <p><a href={this.props.conf.entrypointUrl}>Menu principal</a></p>
         <header className="App-header">
           {this.state.onNewConstructionSite || this.state.constructionSiteSelect ?
             <ConstructionSiteView

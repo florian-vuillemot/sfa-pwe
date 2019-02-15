@@ -2,7 +2,6 @@
   text-align: center;
 }
 
-
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -16,4 +15,8 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.App > p:first-child {
+  width: 100%
 }
