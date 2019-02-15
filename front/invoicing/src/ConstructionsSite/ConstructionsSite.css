@@ -45,7 +45,6 @@ thead > tr > th > button:before {
     content: "\271A";
 }
 
-
 tbody:before {
     content: "-";
     display: block;

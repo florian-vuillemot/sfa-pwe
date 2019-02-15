@@ -2,12 +2,12 @@ export class Clients{
     constructor(clients) {
         this.clients = clients.map(c => c instanceof Client ? c : new Client(c));
     }
-
-    find = (name) => this.clients.find(c => c.name === name);
     
     get clientsName(){
         return this.clients.map(c => c.name);
     }
+
+    find = (name) => this.clients.find(c => c.name === name);
 
     add(newClient) {
         const id = this.clients.length ? this.clients.sort((c1, c2) => c1.id < c2.id)[0].id + 1 : 0

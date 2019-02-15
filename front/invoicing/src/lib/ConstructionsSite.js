@@ -6,19 +6,16 @@ export class ConstructionsSite {
     get workingDays(){
         return this.constructionsSite.reduce((acc, d) => [...acc, ...d.workingDays], []);
     }
-    get nbDaysWorked(){
-        return this.workingDays.reduce((acc, d) => acc + (WorkingDayType.DAY === d.type), 0);
-    }
-    get nbDaysWithHours(){
-        return this.workingDays.reduce((acc, d) => acc + (WorkingDayType.HOURS === d.type), 0);
-    }
-    get nbTransfer(){
-        return this.workingDays.reduce((acc, d) => acc + (WorkingDayType.TRANSFER === d.type), 0);
-    }
+    get nbDaysWorked(){return this.nbGen(WorkingDayType.DAY);}
+    get nbDaysWithHours(){return this.nbGen(WorkingDayType.HOURS);}
+    get nbTransfer(){return this.nbGen(WorkingDayType.TRANSFER);}
 
     map = (f) => this.constructionsSite.map(f);
     filter = (f) => this.constructionsSite.filter(f);
     sort = (f) => this.constructionsSite.sort(f);
+
+    // Private
+    nbGen = (type) => this.workingDays.reduce((acc, d) => acc + (type === d.type), 0);
 }
 
 export class ConstructionSite {
@@ -30,7 +27,7 @@ export class ConstructionSite {
 
     static factory(constructionsSite) {
         const maxId = constructionsSite.length ? constructionsSite.sort((c1, c2) => c1.id < c2.id)[0] : null;
-        const id = maxId ? maxId.id + 1 : 0;
+        const newId = maxId ? maxId.id + 1 : 0;
         const rate = maxId ? maxId.constructionSiteInfo.rate : {};
         const constructionSiteInfo = new ConstructionSiteInfo({
             client: null,
@@ -38,7 +35,7 @@ export class ConstructionSite {
             rate: rate
         });
         return new ConstructionSite({
-            id: id,
+            id: newId,
             constructionSiteInfo: constructionSiteInfo
         });
     }
@@ -46,9 +43,9 @@ export class ConstructionSite {
     get client(){return this.constructionSiteInfo.client;}
     get place(){return this.constructionSiteInfo.place;}
 
-    get transfers(){return this.workingDays.filter(wd => wd.type === WorkingDayType.TRANSFER);}
-    get days(){return this.workingDays.filter(wd => wd.type === WorkingDayType.DAY);}
-    get hours(){return this.workingDays.filter(wd => wd.type === WorkingDayType.HOURS)}
+    get transfers(){return this.getDaysOfTypes(WorkingDayType.TRANSFER);}
+    get days(){return this.getDaysOfTypes(WorkingDayType.DAY);}
+    get hours(){return this.getDaysOfTypes(WorkingDayType.HOURS);}
 
     get price(){return this.workingDays.reduce((acc, wd) => acc + wd.price, 0);}
 
@@ -86,9 +83,9 @@ export class ConstructionSite {
         workingDays: workingDays
     });
 
-    /*
-    * Private
-    */
+    // Private
+    getDaysOfTypes = (type) => this.workingDays.filter(wd => wd.type === type);
+
     updateConstructionSiteInfo(newData){
         const newConstructionSiteInfo = new ConstructionSiteInfo({...this.constructionSiteInfo, ...newData});
         return new ConstructionSite({id: this.id, constructionSiteInfo: newConstructionSiteInfo, workingDays: this.workingDays});
