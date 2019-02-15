@@ -1,0 +1,56 @@
+td, p {
+    width: 130px;
+    height: 40px;
+    margin: 0px;
+}
+
+input {
+    width: 120px;
+    height: 35px;
+    text-align: center;
+    margin: 0;
+}
+  
+i {
+    width: 50px;
+    font-size:36px
+}
+
+table {
+    width: 80%;
+    text-align: left;
+}
+
+thead > tr > th:first-child {
+    width: 300px
+}
+thead > tr > th:last-child {
+    text-align: right
+}
+thead > tr > th > button {
+    border: none;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    transition: all ease 0.4s;
+    cursor: pointer;
+    background-color: white;
+    border: 2px solid white;
+    width: 200px;
+    height: 70px;
+}
+thead > tr > th > button:before {
+    content: "\271A";
+}
+
+tbody:before {
+    content: "-";
+    display: block;
+    line-height: 5em;
+    color: transparent;
+}
+tbody > tr > th {
+    border-bottom: 1px dashed white;
+}
