@@ -120,6 +120,12 @@ class App extends Component {
             </thead>
             <tbody>
               <tr>
+                <th></th>
+                <th colSpan="2">Général</th>
+                <th colSpan="3">Paiment</th>
+                <th colSpan="3">Prix</th>
+              </tr>
+              <tr>
                 <th>Date</th>
                 <th>Catégorie</th>
                 <th>Libellé</th>
@@ -127,8 +133,8 @@ class App extends Component {
                 <th>Num chèque</th>
                 <th>Num facture</th>
                 <th>TVA</th>
-                <th>Prix HT</th>
-                <th>Prix TTC</th>
+                <th>HT</th>
+                <th>TTC</th>
               </tr>
               <tr>
                 <td><input type="date" name="date" /></td>

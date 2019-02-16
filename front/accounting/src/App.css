@@ -14,7 +14,7 @@ input {
   height: 35px;
 }
 input[type="number"], .Cheque-number {
-  width: 50px;
+  width: 70px;
 }
 input[type="select"] {
   width: 100%;
