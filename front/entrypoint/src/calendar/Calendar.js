@@ -68,10 +68,10 @@ class Calendar extends Component {
 
     handleClick() {
         const year = parseInt(this.state.year);
-        const monthExist = this.months().find(m => m === this.state.month);
+        const monthNb = this.months().indexOf(this.state.month);
         
-        if (2010 <= year && year < 2100 && monthExist){
-            this.props.onClick(this.state.year, this.state.month);
+        if (2010 <= year && year < 2100 && monthNb !== -1){
+            this.props.onClick(this.state.year, monthNb);
         }
         else {
             alert('Date incorrect')

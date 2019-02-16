@@ -9,7 +9,7 @@ class App extends Component {
 
     this.state = {
       year: null,
-      strMonth: null
+      month: null
     }
 
     this.handleClick = this.handleClick.bind(this); 
@@ -19,14 +19,14 @@ class App extends Component {
   clear() {
     this.setState({
       year: null,
-      strMonth: null
+      month: null
     });
   }
 
-  handleClick(year, strMonth){
+  handleClick(year, month){
     this.setState({
       year: year,
-      strMonth: strMonth
+      month: month
     });
   }
 
@@ -34,8 +34,10 @@ class App extends Component {
     if (this.state.year === null){
       return <Calendar onClick={this.handleClick} />
     }
+
+    const invoicingUrl = `${this.props.conf.invoicingUrl}?year=${this.state.year}&month=${this.state.month}`;
     return <SelectionAccountingInvoicing
-                isInvoicing={() => window.location.href = this.props.conf.invoicingUrl}
+                isInvoicing={() => window.location.href = invoicingUrl}
                 isAccounting={() => console.log("account")}
                 back={() => this.clear()}
             />

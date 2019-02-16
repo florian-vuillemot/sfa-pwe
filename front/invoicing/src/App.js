@@ -5,6 +5,8 @@ import {ConstructionsSite as ConstructionsSiteView} from './ConstructionsSite/Co
 import {ConstructionsSite, ConstructionSite} from './lib/ConstructionsSite';
 import { Clients } from './lib/Client';
 
+const queryString = require('query-string');
+
 function GetConstructionsSite() {
   const data = [
     {
@@ -93,8 +95,14 @@ class App extends Component {
     super(props);
 
     const data = GetConstructionsSite();
+    const date = getDate();
+
+    if (!date) {
+      window.location.href = this.props.conf.entrypointUrl;
+    }
     
     this.state = {
+      date: date,
       onNewConstructionSite: false,
       constructionSiteSelect: false,
       data: data,
@@ -174,6 +182,21 @@ class App extends Component {
       </div>
     );
   }
+}
+
+function getDate() {
+  const date = queryString.parse(window.location.search);
+
+  const year = parseInt(date.year);
+  const month = parseInt(date.month);
+
+  if (year && (month || 0 === month)) {
+    return {
+      year: year,
+      month: month
+    }
+  }
+  return undefined
 }
 
 export default App;
