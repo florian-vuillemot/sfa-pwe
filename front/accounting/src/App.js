@@ -1,101 +1,17 @@
 import React, { Component } from 'react';
 import './App.css';
-
-class Accounting {
-  constructor(expenses) {
-    this.expenses = expenses.map(a => new Expenses(a));
-  }
-}
-
-class Expenses {
-  constructor({id, date, price, payment, info}){
-    this.id = id;
-    this.date = new Date(date);
-    this.price = new Price(price);
-    this.payment = new Payment(payment);
-    this.info = new Info(info);
-  }
-
-  get year(){return this.date.year};
-  get month(){return this.date.month};
-  get day(){return this.date.day};
-
-  get taxFreePrice(){return this.price.taxFreePrice};
-  get realPrice(){return this.price.price};
-  get taxPercent(){return this.price.taxPercent};
-
-  get description(){return this.payment.description};
-  get invoiceNumber(){return this.payment.invoiceNumber};
-  
-  get chequeNumber(){return this.payment.chequeNumber};
-  get method(){return this.payment.method};
-}
-
-class Date {
-  constructor({year, month, day}){
-    this.year = year;
-    this.month = month;
-    this.day = day;
-  }
-}
-
-class Price {
-  constructor({taxFreePrice, price, taxPercent}) {
-    this.taxFreePrice = taxFreePrice;
-    this.price = price;
-    this.taxPercent = taxPercent;
-  }
-}
-
-class Info {
-  constructor({description, invoiceNumber, categorie = null}) {
-    this.description = description;
-    this.invoiceNumber = invoiceNumber;
-    if (categorie){
-      this.categorie = typeof categorie === 'symbol' ? categorie : CategorieType[categorie];
-    }
-    else {
-      this.categorie = CategorieType[null];
-    }
-  }
-}
-
-class Payment {
-  constructor({method, chequeNumber}) {
-    this.method = typeof method === "symbol" ? method : PaymentMethod[method];
-    this.chequeNumber = chequeNumber;
-  }
-}
-
-export const CategorieType = Object.freeze({
-  null: Symbol(null),
-  GIFT: Symbol("GIFT"),
-  DIESEL_MACHINES: Symbol("DIESEL MACHINES"),
-  DIESEL_VAN: Symbol("DIESEL VAN"),
-  ADMINISTRATIVE: Symbol("ADMINISTRATIVE"),
-  MAINTENANCE_VAN: Symbol("MAINTENANCE VAN"),
-  MAINTENANCE_OK: Symbol("MAINTENANCE OK"),
-  MAINTENANCE_VOLVO: Symbol("MAINTENANCE VOLVO"),
-  OTHER: Symbol("OTHER"),
-  CREDIT: Symbol("CREDIT")
-});
-
-export const PaymentMethod = Object.freeze({
-  CB: Symbol("CB"),
-  CHEQUE: Symbol("CHEQUE"),
-  CASH: Symbol("CASH")
-});
+import {Accounting, CategoryType, PaymentMethod} from './lib/Accounting';
 
 function getAccounting() {
   return [{
     id: 1,
     date: {year: 2019, month: 3, day: 3},
     price: {price: 120.00, taxPercent: 20, taxFreePrice: 100},
-    payment: {method: "CB", chequeNumber: null},
+    payment: {method: "CASH", chequeNumber: null},
     info: {description: "libelle", invoiceNumber: "FDS23"}
   }, {
     id: 2,
-    date: {year: 2018, month: 3, day:1},
+    date: {year: 2019, month: 3, day:1},
     price: {price: 240.00, taxPercent: 20, taxFreePrice: 200},
     payment: {method: "CB", chequeNumber: null},
     info: {description: "libelle", invoiceNumber: "FDS23"}
@@ -108,7 +24,103 @@ class App extends Component {
     this.state = {
       accounting: new Accounting(getAccounting())
     };
-    console.log(this.state.accounting);
+    this.onChange = this.onChange.bind(this);
+    this.updateExpense = this.updateExpense.bind(this);
+  }
+
+  accountingSort = () => this.state.accounting.sort((a1, a2) => a1.id > a2.id);
+
+  updateExpense(expense) {
+    const newAccounting = this.state.accounting
+                              .removeExpense(expense)
+                              .addExpense(expense)
+                              .compute();
+    this.setState({accounting: newAccounting});
+  }
+
+  categoryExpenseSelect(expense, onChange) {
+    return (
+      <select defaultValue={CategoryType.toString(expense.category)}
+              name="category" onChange={onChange}
+      >
+        <option disabled value="">----</option>
+        <option value="GIFT">Cadeau client</option>
+        <option value="DIESEL_MACHINES">Diesel machines</option>
+        <option value="DIESEL_VAN">Diesel fourgon</option>
+        <option value="ADMINISTRATIVE">Adminstratif</option>
+        <option value="MAINTENANCE_VAN">Maintenance fourgon</option>
+        <option value="MAINTENANCE_OK">Maintenance O&K</option>
+        <option value="MAINTENANCE_VOLVO">Maintenace Volvo</option>
+        <option value="OTHER">Autre</option>
+        <option value="CREDIT">Crédit</option>
+      </select>
+    );
+  }
+
+  paymentMethodSelect(expense, onChange) {
+    return (
+      <select defaultValue={PaymentMethod.toString(expense.paymentMethod)}
+              name="paymentMethod" onChange={onChange}
+      >
+        <option value="CB">CB</option>
+        <option value="CHEQUE">Chèque</option>
+        <option value="CASH">Cash</option>
+        <option value="DIRECT_DEBIT">Débit</option>
+        <option value="CREDIT">Crédit</option>
+      </select>
+    );
+  }
+
+  onChange(expense, field, value) {
+    const newExpense = expense.update(field, value);
+    this.updateExpense(newExpense);
+  }
+
+  tableLine(expense){
+    const onChange = (e) => this.onChange(expense, e.target.name, e.target.value);
+
+    return (
+      <tr key={expense.id}>
+        <td>
+          <input  type="date" name="date"
+                  defaultValue={expense.stringDate}
+                  onChange={onChange}
+                  /></td>
+        <th>
+          {this.categoryExpenseSelect(expense, onChange)}</th>
+        <th>
+          <input  type="text" name="description"
+                  defaultValue={expense.description}
+                  onChange={onChange}
+                  /></th>
+        <th>
+          {this.paymentMethodSelect(expense, onChange)}</th>
+        <th>
+          {expense.paymentMethod === PaymentMethod.CHEQUE &&
+            <input  type="text" name="chequeNumber"
+                    className="Cheque-number" defaultValue={expense.chequeNumber}
+                    onChange={onChange}
+                    />
+          }</th>
+        <th>
+            <input  type="text" name="invoiceNumber"
+                    className="Invoice-number" defaultValue={expense.invoiceNumber}
+                    onChange={onChange}
+                    /></th>
+        <th>
+          <input  type="number" name="taxPercent"
+                  step="any" defaultValue={expense.taxPercent}
+                  onChange={onChange}
+                  /></th>
+        <th>
+          {expense.taxFreePrice}</th>
+        <th>
+          <input  type="number" name="realPrice"
+                  step="any" defaultValue={expense.realPrice}
+                  onChange={onChange}
+                  /></th>
+      </tr>
+    );
   }
 
   render() {
@@ -130,33 +142,14 @@ class App extends Component {
                 <th>Catégorie</th>
                 <th>Libellé</th>
                 <th>Paiement</th>
-                <th>Num chèque</th>
-                <th>Num facture</th>
+                <th>{this.state.accounting.nbCheque !== 0 && "Num"}</th>
+                <th>Facture</th>
                 <th>TVA</th>
                 <th>HT</th>
                 <th>TTC</th>
               </tr>
-              <tr>
-                <td><input type="date" name="date" /></td>
-                <th>
-                  <select>
-                    <option value="DIESEL">Essence</option>
-                  </select>
-                </th>
-                <th><input type="text" name="description" /></th>
-                <th>
-                  <select>
-                    <option value="CB">CB</option>
-                    <option value="CHEQUE">Chèque</option>
-                    <option value="CASH">Cash</option>
-                  </select>
-                </th>
-                <th><input type="text" name="chequeNumber" className="Cheque-number" /></th>
-                <th><input type="text" name="invoiceNumber" className="Invoice-number" /></th>
-                <th><input type="number" name="taxPercent" step="any" /></th>
-                <th><input type="number" name="taxFreePrice" step="any" /></th>
-                <th><input type="number" name="realPrice" step="any" /></th>
-              </tr>
+              {this.accountingSort().map(e => this.tableLine(e))}
+              {this.tableLine(this.state.accounting.newExpense())}
             </tbody>
           </table>
       </div>

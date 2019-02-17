@@ -16,7 +16,7 @@ input {
 input[type="number"], .Cheque-number {
   width: 70px;
 }
-input[type="select"] {
+select {
   width: 100%;
 }
 
