@@ -18,57 +18,95 @@ function getAccounting() {
   }];
 }
 
+const categoryExpenseSelect = (category, onChange) => (
+    <select defaultValue={CategoryType.toString(category)} name="category" onChange={onChange} >
+      <option disabled value="">----</option>
+      <option value="GIFT">Cadeau client</option>
+      <option value="DIESEL_MACHINES">Diesel machines</option>
+      <option value="DIESEL_VAN">Diesel fourgon</option>
+      <option value="ADMINISTRATIVE">Adminstratif</option>
+      <option value="MAINTENANCE_VAN">Maintenance fourgon</option>
+      <option value="MAINTENANCE_OK">Maintenance O&K</option>
+      <option value="MAINTENANCE_VOLVO">Maintenace Volvo</option>
+      <option value="OTHER">Autre</option>
+      <option value="CREDIT">Crédit</option>
+    </select>
+);
+
+const paymentMethodSelect = (paymentMethod, onChange) => (
+  <select defaultValue={PaymentMethod.toString(paymentMethod)} name="paymentMethod" onChange={onChange} >
+    <option value="CB">CB</option>
+    <option value="CHEQUE">Chèque</option>
+    <option value="CASH">Cash</option>
+    <option value="DIRECT_DEBIT">Débit</option>
+    <option value="CREDIT">Crédit</option>
+  </select>
+);
+
+const chequeView = (paymentMethod, chequeNumber, onChange) => (
+  <th>{
+    paymentMethod === PaymentMethod.CHEQUE &&
+    <input  type="text" name="chequeNumber"
+            className="Cheque-number" defaultValue={chequeNumber}
+            onChange={onChange}
+            />
+  }</th>
+);
+
+const invoiceView = (invoiceNumber, onChange, useColspan = false) => {
+  const colspan = useColspan ? {"colSpan": 2} : {};
+  return (
+    <th {...colspan}>
+      <input  type="text" name="invoiceNumber"
+              className="Invoice-number" defaultValue={invoiceNumber}
+              onChange={onChange}
+              />
+    </th>
+  );
+};
+
+const chequeNumberAndBillingView = (nbChequeNotNull) => {
+  if (nbChequeNotNull){
+    return (
+      <>
+        <th>Cheque</th>
+        <th>Facture</th>
+      </>
+    );
+  }
+  return (<th colSpan="2">Facture</th>)
+}
+
+const chequeAndInvoiceView = (nbChequeNotNull, onChange, {paymentMethod, chequeNumber, invoiceNumber}) => {
+  if (nbChequeNotNull) {
+    return (
+      <>
+        {chequeView(paymentMethod, chequeNumber, onChange)}
+        {invoiceView(invoiceNumber, onChange)}
+      </>
+    );
+  }
+  return (<>{invoiceView(invoiceNumber, onChange, true)}</>);
+}
+
 class App extends Component {
   constructor(props){
     super(props);
+
     this.state = {
       accounting: new Accounting(getAccounting())
     };
+
     this.onChange = this.onChange.bind(this);
     this.updateExpense = this.updateExpense.bind(this);
   }
 
   accountingSort = () => this.state.accounting.sort((a1, a2) => a1.id > a2.id);
+  nbChequeNotNull = () => this.state.accounting.nbCheque !== 0;
 
   updateExpense(expense) {
-    const newAccounting = this.state.accounting
-                              .removeExpense(expense)
-                              .addExpense(expense)
-                              .compute();
+    const newAccounting = this.state.accounting.removeExpense(expense).addExpense(expense).compute();
     this.setState({accounting: newAccounting});
-  }
-
-  categoryExpenseSelect(expense, onChange) {
-    return (
-      <select defaultValue={CategoryType.toString(expense.category)}
-              name="category" onChange={onChange}
-      >
-        <option disabled value="">----</option>
-        <option value="GIFT">Cadeau client</option>
-        <option value="DIESEL_MACHINES">Diesel machines</option>
-        <option value="DIESEL_VAN">Diesel fourgon</option>
-        <option value="ADMINISTRATIVE">Adminstratif</option>
-        <option value="MAINTENANCE_VAN">Maintenance fourgon</option>
-        <option value="MAINTENANCE_OK">Maintenance O&K</option>
-        <option value="MAINTENANCE_VOLVO">Maintenace Volvo</option>
-        <option value="OTHER">Autre</option>
-        <option value="CREDIT">Crédit</option>
-      </select>
-    );
-  }
-
-  paymentMethodSelect(expense, onChange) {
-    return (
-      <select defaultValue={PaymentMethod.toString(expense.paymentMethod)}
-              name="paymentMethod" onChange={onChange}
-      >
-        <option value="CB">CB</option>
-        <option value="CHEQUE">Chèque</option>
-        <option value="CASH">Cash</option>
-        <option value="DIRECT_DEBIT">Débit</option>
-        <option value="CREDIT">Crédit</option>
-      </select>
-    );
   }
 
   onChange(expense, field, value) {
@@ -78,76 +116,24 @@ class App extends Component {
 
   tableLine(expense){
     const onChange = (e) => this.onChange(expense, e.target.name, e.target.value);
-    const chequeAndInvoice = () => {
-      const cheque = () => (
-        <th>{
-          expense.paymentMethod === PaymentMethod.CHEQUE &&
-          <input  type="text" name="chequeNumber"
-                  className="Cheque-number" defaultValue={expense.chequeNumber}
-                  onChange={onChange}
-                  />
-        }</th>
-      );
-      const invoice = (useColspan = false) => {
-        const colspan = useColspan ? {"colSpan": 2} : {};
-        return (
-          <th {...colspan}>
-            <input  type="text" name="invoiceNumber"
-                    className="Invoice-number" defaultValue={expense.invoiceNumber}
-                    onChange={onChange}
-                    />
-          </th>
-        );
-      };
-      return this.nbChequeNotNull() ? <>{cheque()}{invoice()}</> : <>{invoice(true)}</>
-    }
+    const inputView = (type, name, value) => {
+      const step = type === "number" ? {"step": "Any"} : {};
+      return (<input type={type} name={name} defaultValue={value} onChange={onChange} {...step} />);
+    };
 
     return (
       <tr key={expense.id}>
-        <td>
-          <input  type="date" name="date"
-                  defaultValue={expense.stringDate}
-                  onChange={onChange}
-                  /></td>
-        <th>
-          {this.categoryExpenseSelect(expense, onChange)}</th>
-        <th>
-          <input  type="text" name="description"
-                  defaultValue={expense.description}
-                  onChange={onChange}
-                  /></th>
-        <th>
-          {this.paymentMethodSelect(expense, onChange)}</th>
-        {chequeAndInvoice()}
-        <th>
-          <input  type="number" name="taxPercent"
-                  step="any" defaultValue={expense.taxPercent}
-                  onChange={onChange}
-                  /></th>
-        <th>
-          {expense.taxFreePrice}</th>
-        <th>
-          <input  type="number" name="realPrice"
-                  step="any" defaultValue={expense.realPrice}
-                  onChange={onChange}
-                  /></th>
+        <td>{inputView("date", "date", expense.stringDate)}</td>
+        <th>{categoryExpenseSelect(expense.category, onChange)}</th>
+        <th>{inputView("text", "description", expense.description)}</th>
+        <th>{paymentMethodSelect(expense.paymentMethod, onChange)}</th>
+        {chequeAndInvoiceView(this.nbChequeNotNull, onChange, expense)}
+        <th>{inputView("number", "taxPercent", expense.taxPercent)}</th>
+        <th>{expense.taxFreePrice}</th>
+        <th>{inputView("number", "realPrice", expense.realPrice)}</th>
       </tr>
     );
   }
-
-  chequeNumberAndBillingView() {
-    if (this.nbChequeNotNull()){
-      return (
-        <>
-          <th>Cheque</th>
-          <th>Facture</th>
-        </>
-      );
-    }
-    return (<th colSpan="2">Facture</th>)
-  }
-
-  nbChequeNotNull = () => this.state.accounting.nbCheque !== 0;
 
   render() {
     return (
@@ -156,20 +142,20 @@ class App extends Component {
         <div className="App-font">
           <table border="1">
             <thead>
-            </thead>
-            <tbody>
-              <tr>
+            <tr>
                 <th></th>
                 <th colSpan="2">Général</th>
                 <th colSpan="3">Paiment</th>
                 <th colSpan="3">Prix</th>
               </tr>
+            </thead>
+            <tbody>
               <tr>
                 <th>Date</th>
                 <th>Catégorie</th>
                 <th>Libellé</th>
                 <th>Paiement</th>
-                {this.chequeNumberAndBillingView()}
+                {chequeNumberAndBillingView(this.nbChequeNotNull())}
                 <th>TVA</th>
                 <th>HT</th>
                 <th>TTC</th>

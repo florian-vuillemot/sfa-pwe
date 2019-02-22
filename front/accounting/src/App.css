@@ -29,6 +29,6 @@ select {
 table {
   width: 100%;
 }
-table > tbody > tr:nth-child(2n + 4){
+table > tbody > tr:nth-child(2n + 3){
   background-color:#708090;
 }
