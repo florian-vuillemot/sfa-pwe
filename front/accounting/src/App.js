@@ -7,7 +7,7 @@ function getAccounting() {
     id: 1,
     date: {year: 2019, month: 3, day: 3},
     price: {price: 120.00, taxPercent: 20, taxFreePrice: 100},
-    payment: {method: "CASH", chequeNumber: null},
+    payment: {method: "CHEQUE", chequeNumber: "323"},
     info: {description: "libelle", invoiceNumber: "FDS23"}
   }, {
     id: 2,
@@ -78,6 +78,29 @@ class App extends Component {
 
   tableLine(expense){
     const onChange = (e) => this.onChange(expense, e.target.name, e.target.value);
+    const chequeAndInvoice = () => {
+      const cheque = () => (
+        <th>{
+          expense.paymentMethod === PaymentMethod.CHEQUE &&
+          <input  type="text" name="chequeNumber"
+                  className="Cheque-number" defaultValue={expense.chequeNumber}
+                  onChange={onChange}
+                  />
+        }</th>
+      );
+      const invoice = (useColspan = false) => {
+        const colspan = useColspan ? {"colSpan": 2} : {};
+        return (
+          <th {...colspan}>
+            <input  type="text" name="invoiceNumber"
+                    className="Invoice-number" defaultValue={expense.invoiceNumber}
+                    onChange={onChange}
+                    />
+          </th>
+        );
+      };
+      return this.nbChequeNotNull() ? <>{cheque()}{invoice()}</> : <>{invoice(true)}</>
+    }
 
     return (
       <tr key={expense.id}>
@@ -95,18 +118,7 @@ class App extends Component {
                   /></th>
         <th>
           {this.paymentMethodSelect(expense, onChange)}</th>
-        <th>
-          {expense.paymentMethod === PaymentMethod.CHEQUE &&
-            <input  type="text" name="chequeNumber"
-                    className="Cheque-number" defaultValue={expense.chequeNumber}
-                    onChange={onChange}
-                    />
-          }</th>
-        <th>
-            <input  type="text" name="invoiceNumber"
-                    className="Invoice-number" defaultValue={expense.invoiceNumber}
-                    onChange={onChange}
-                    /></th>
+        {chequeAndInvoice()}
         <th>
           <input  type="number" name="taxPercent"
                   step="any" defaultValue={expense.taxPercent}
@@ -123,12 +135,27 @@ class App extends Component {
     );
   }
 
+  chequeNumberAndBillingView() {
+    if (this.nbChequeNotNull()){
+      return (
+        <>
+          <th>Cheque</th>
+          <th>Facture</th>
+        </>
+      );
+    }
+    return (<th colSpan="2">Facture</th>)
+  }
+
+  nbChequeNotNull = () => this.state.accounting.nbCheque !== 0;
+
   render() {
     return (
       <div className="App">
-          <table>
+        <p><a href={this.props.conf.entrypointUrl}>Menu principal</a></p>
+        <div className="App-font">
+          <table border="1">
             <thead>
-
             </thead>
             <tbody>
               <tr>
@@ -142,8 +169,7 @@ class App extends Component {
                 <th>Catégorie</th>
                 <th>Libellé</th>
                 <th>Paiement</th>
-                <th>{this.state.accounting.nbCheque !== 0 && "Num"}</th>
-                <th>Facture</th>
+                {this.chequeNumberAndBillingView()}
                 <th>TVA</th>
                 <th>HT</th>
                 <th>TTC</th>
@@ -152,6 +178,7 @@ class App extends Component {
               {this.tableLine(this.state.accounting.newExpense())}
             </tbody>
           </table>
+        </div>
       </div>
     );
   }
