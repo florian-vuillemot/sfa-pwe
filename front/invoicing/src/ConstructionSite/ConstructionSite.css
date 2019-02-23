@@ -2,22 +2,18 @@ input, select, option {
     width: 120px;
     height: 35px;
     text-align: center;
-    margin: 0;
 }
-
 
 .Construction-Site {
     width: 80%;
-    text-align: left;
+    text-align: center;
 }
 .Construction-Site > thead > tr > th:first-child {
-    width: 300px
+    width: 300px;
+    text-align: left;
 }
 .Construction-Site > thead > tr > th:last-child {
-    text-align: right
-} 
-.Construction-Site > tbody > tr > th, .Construction-Site > tbody > tr > td {
-    text-align: center
+    text-align: right;
 } 
 .Construction-Site > tfoot {
     text-align: right;

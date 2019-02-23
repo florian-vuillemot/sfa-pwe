@@ -163,7 +163,7 @@ class App extends Component {
     return (
       <div className="App">
         <p><a href={this.props.conf.entrypointUrl}>Menu principal</a></p>
-        <header className="App-header">
+        <main className="App-main">
           {this.state.onNewConstructionSite || this.state.constructionSiteSelect ?
             <ConstructionSiteView
               clients={this.state.clients}
@@ -178,7 +178,7 @@ class App extends Component {
                 onConstructionSiteSelect={this.constructionSiteSelect}
               />
           }
-        </header>
+        </main>
       </div>
     );
   }

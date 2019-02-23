@@ -1,7 +1,8 @@
 td, p {
     width: 130px;
     height: 40px;
-    margin: 0px;
+    margin: auto;
+    text-align: center
 }
 
 input {
@@ -18,11 +19,12 @@ i {
 
 table {
     width: 80%;
-    text-align: left;
+    text-align: center;
 }
 
 thead > tr > th:first-child {
-    width: 300px
+    width: 300px;
+    text-align: left
 }
 thead > tr > th:last-child {
     text-align: right
