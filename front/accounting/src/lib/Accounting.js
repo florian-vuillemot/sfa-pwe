@@ -13,11 +13,11 @@ export class Accounting {
         const lastExpense = len ? expensesSort[len - 1] : null;
         const newId = lastExpense ? lastExpense.id + 1 : 0;
         const newDate = lastExpense ? lastExpense.date : {};
-        const tax = lastExpense ? lastExpense.price.tax : null;
+        const taxPercent = lastExpense ? lastExpense.price.taxPercent : null;
         return new Expense({
             id: newId,
             date: newDate,
-            price: new Price({tax: tax})
+            price: new Price({taxPercent: taxPercent})
         });
     }
 
