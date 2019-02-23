@@ -20,13 +20,9 @@ export class Accounting {
             price: new Price({tax: tax})
         });
     }
-    addExpense(expense) {
-        return new Accounting([...this.expenses, expense]);
-    }
-    removeExpense(expense) {
-        const newExpenses = this.filter(e => e.id !== expense.id);
-        return new Accounting(newExpenses);
-    }
+
+    addExpense = (expense) => new Accounting([...this.expenses, expense]);
+    removeExpense = (expense) => new Accounting(this.filter(e => e.id !== expense.id));
 
     compute() {
         const expenses = this.expenses.map(e => e.compute());
