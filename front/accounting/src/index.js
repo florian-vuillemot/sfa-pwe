@@ -5,7 +5,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 const conf = {
-    entrypointUrl: "http://linux-tzpr:3000/"
+    entrypointUrl: "http://localhost:3000/"
 };
 
 ReactDOM.render(<App conf={conf}/>, document.getElementById('root'));
