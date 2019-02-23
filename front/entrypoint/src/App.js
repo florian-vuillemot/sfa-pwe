@@ -34,9 +34,9 @@ class App extends Component {
     if (this.state.year === null){
       return <Calendar onClick={this.handleClick} />
     }
-
-    const invoicingUrl = `${this.props.conf.invoicingUrl}?year=${this.state.year}&month=${this.state.month}`;
-    const accountingUrl = `${this.props.conf.accountingUrl}?year=${this.state.year}&month=${this.state.month}`;
+    const args = `?year=${this.state.year}&month=${this.state.month}`;
+    const invoicingUrl = `${this.props.conf.invoicingUrl}${args}`;
+    const accountingUrl = `${this.props.conf.accountingUrl}${args}`;
     return <SelectionAccountingInvoicing
                 isInvoicing={() => window.location.href = invoicingUrl}
                 isAccounting={() => window.location.href = accountingUrl}
