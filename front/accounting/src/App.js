@@ -5,7 +5,6 @@ import {Accounting, CategoryType, PaymentMethod} from './lib/Accounting';
 const queryString = require('query-string');
 
 function getAccounting(date) {
-  console.log("Selection en fonction de: ", date);
   return [{
     id: 1,
     date: {year: 2019, month: 3, day: 3},
