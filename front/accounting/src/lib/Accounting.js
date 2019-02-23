@@ -69,19 +69,17 @@ export class Expense {
     get paymentMethod(){return this.payment.method};
 
     update(field, value) {
-        // TODO: clean
-        let _field = field;
-        if (_field === "paymentMethod") {
-            _field = "method";
+        if (field === "paymentMethod") {
+            return this.update("method", value);
         }
-        if (_field === "realPrice"){
-            _field = "price";
+        if (field === "realPrice"){
+            return this.update("price", value);
         }
         const id = this.id;
-        const newDate = new Date(_field === "date" ? value : this.date);
-        const price = new Price({...this.price, [_field]: value}).compute();
-        const newPayment = new Payment({...this.payment, [_field]: value});
-        const newInfo = new Info({...this.info, [_field]: value});
+        const newDate = new Date(field === "date" ? value : this.date);
+        const price = new Price({...this.price, [field]: value}).compute();
+        const newPayment = new Payment({...this.payment, [field]: value});
+        const newInfo = new Info({...this.info, [field]: value});
         return new Expense({
             id: id,
             date: newDate,
@@ -99,11 +97,6 @@ class Date {
         let year, month, day = null;
         if (typeof date === "string"){
             ([year, month, day] = [...date.split('-').map(n => parseInt(n))]);
-        }
-        else if (date instanceof Date){
-            year = date.year;
-            month = date.month;
-            day = date.day;
         }
         else {
             ({year, month, day} = date);
