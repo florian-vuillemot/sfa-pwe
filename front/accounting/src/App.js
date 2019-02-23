@@ -105,14 +105,13 @@ class App extends Component {
   nbChequeNotNull = () => this.state.accounting.nbCheque !== 0;
 
   updateExpense(expense) {
-    const newAccounting = this.state.accounting.removeExpense(expense).addExpense(expense).compute();
-    this.setState({accounting: newAccounting});
+    const accounting = this.state.accounting;
+    const newAccounting = accounting.removeExpense(expense).addExpense(expense);
+    const newAccountingCompute = newAccounting.compute();
+    this.setState({accounting: newAccountingCompute});
   }
 
-  onChange(expense, field, value) {
-    const newExpense = expense.update(field, value);
-    this.updateExpense(newExpense);
-  }
+  onChange = (expense, field, value) => this.updateExpense(expense.update(field, value));
 
   tableLine(expense){
     const onChange = (e) => this.onChange(expense, e.target.name, e.target.value);
