@@ -69,6 +69,7 @@ export class Expense {
     get paymentMethod(){return this.payment.method};
 
     update(field, value) {
+        // TODO: clean
         let _field = field;
         if (_field === "paymentMethod") {
             _field = "method";
@@ -76,13 +77,17 @@ export class Expense {
         if (_field === "realPrice"){
             _field = "price";
         }
-        const price = new Price({...this.price, [_field]: value});
+        const id = this.id;
+        const newDate = new Date(_field === "date" ? value : this.date);
+        const price = new Price({...this.price, [_field]: value}).compute();
+        const newPayment = new Payment({...this.payment, [_field]: value});
+        const newInfo = new Info({...this.info, [_field]: value});
         return new Expense({
-            id: this.id,
-            date: new Date({...this.date, [_field]: value}),
-            price: price.compute(),
-            payment: new Payment({...this.payment, [_field]: value}),
-            info: new Info({...this.info, [_field]: value})
+            id: id,
+            date: newDate,
+            price: price,
+            payment: newPayment,
+            info: newInfo
         });
     }
     
@@ -90,10 +95,22 @@ export class Expense {
 }
   
 class Date {
-    constructor({year = null, month = null, day = null}){
-      this.year = year;
-      this.month = month;
-      this.day = day;
+    constructor(date){
+        let year, month, day = null;
+        if (typeof date === "string"){
+            ([year, month, day] = [...date.split('-').map(n => parseInt(n))]);
+        }
+        else if (date instanceof Date){
+            year = date.year;
+            month = date.month;
+            day = date.day;
+        }
+        else {
+            ({year, month, day} = date);
+        }
+        this.year = year;
+        this.month = month;
+        this.day = day;
     }
 
     toString = () => {
