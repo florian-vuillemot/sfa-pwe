@@ -36,9 +36,10 @@ class App extends Component {
     }
 
     const invoicingUrl = `${this.props.conf.invoicingUrl}?year=${this.state.year}&month=${this.state.month}`;
+    const accountingUrl = `${this.props.conf.accountingUrl}?year=${this.state.year}&month=${this.state.month}`;
     return <SelectionAccountingInvoicing
                 isInvoicing={() => window.location.href = invoicingUrl}
-                isAccounting={() => console.log("account")}
+                isAccounting={() => window.location.href = accountingUrl}
                 back={() => this.clear()}
             />
   }

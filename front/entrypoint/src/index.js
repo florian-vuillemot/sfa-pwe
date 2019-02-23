@@ -5,7 +5,8 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 const conf = {
-    invoicingUrl: "http://linux-tzpr:3001/"
+    invoicingUrl: "http://localhost:3001/",
+    accountingUrl: "http://localhost:3002/"
 };
 
 ReactDOM.render(<App conf={conf}/>, document.getElementById('root'));
