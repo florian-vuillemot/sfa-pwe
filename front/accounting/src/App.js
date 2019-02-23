@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import './App.css';
 import {Accounting, CategoryType, PaymentMethod} from './lib/Accounting';
 
-function getAccounting() {
+const queryString = require('query-string');
+
+function getAccounting(date) {
   return [{
     id: 1,
     date: {year: 2019, month: 3, day: 3},
@@ -86,12 +88,32 @@ const chequeAndInvoiceView = (nbChequeNotNull, onChange, {paymentMethod, chequeN
   return (<>{invoiceView(invoiceNumber, onChange, true)}</>);
 }
 
+function getDate() {
+  const date = queryString.parse(window.location.search);
+
+  const year = parseInt(date.year);
+  const month = parseInt(date.month);
+
+  if (year && (month || 0 === month)) {
+    return {
+      year: year,
+      month: month
+    }
+  }
+  return undefined
+}
+
 class App extends Component {
   constructor(props){
     super(props);
 
+    const date = getDate();
+    if (!date) {
+      window.location.href = this.props.conf.entrypointUrl;
+    }
+
     this.state = {
-      accounting: new Accounting(getAccounting())
+      accounting: new Accounting(getAccounting(date))
     };
 
     this.onChange = this.onChange.bind(this);
