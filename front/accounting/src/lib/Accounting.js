@@ -6,28 +6,29 @@ export class Accounting {
     map = (e) => this.expenses.map(e);
     filter = (e) => this.expenses.filter(e);
     sort = (e) => this.expenses.sort(e);
+    sortById = () => this.sort((e1, e2) => e1.id > e2.id);
 
     newExpense() {
         const len = this.expenses.length;
-        const expensesSort = this.expenses.sort((e1, e2) => e1.id > e2.id);
-        const lastExpense = len ? expensesSort[len - 1] : null;
-        const newId = lastExpense ? lastExpense.id + 1 : 0;
-        const newDate = lastExpense ? lastExpense.date : {};
-        const taxPercent = lastExpense ? lastExpense.price.taxPercent : null;
+        if (len){
+            const lastExpense = this.sortById()[len - 1];
+            return new Expense({
+                id: lastExpense.id + 1,
+                date: lastExpense.date,
+                price: new Price({
+                    taxPercent: lastExpense.price.taxPercent
+                })
+            });
+        }
         return new Expense({
-            id: newId,
-            date: newDate,
-            price: new Price({taxPercent: taxPercent})
+            id: 0
         });
     }
 
     addExpense = (expense) => new Accounting([...this.expenses, expense]);
     removeExpense = (expense) => new Accounting(this.filter(e => e.id !== expense.id));
 
-    compute() {
-        const expenses = this.expenses.map(e => e.compute());
-        return new Accounting(expenses);
-    }
+    compute = () => new Accounting(this.expenses.map(e => e.compute()));
 
     get nbCheque() {return this.nbGen(PaymentMethod.CHEQUE);}
     get nbCB() {return this.nbGen(PaymentMethod.CB);}
@@ -90,12 +91,14 @@ export class Expense {
   
 class Date {
     constructor(date){
-        let year, month, day = null;
-        if (typeof date === "string"){
-            ([year, month, day] = [...date.split('-').map(n => parseInt(n))]);
-        }
-        else {
-            ({year, month, day} = date);
+        let year, month, day = 0;
+        if (date) {
+            if (typeof date === "string"){
+                ([year, month, day] = [...date.split('-').map(n => parseInt(n))]);
+            }
+            else {
+                ({year, month, day} = date);
+            }
         }
         this.year = year;
         this.month = month;

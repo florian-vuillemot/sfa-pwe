@@ -99,7 +99,7 @@ class App extends Component {
   }
 
   get nbChequeNotNull(){return this.state.accounting.nbCheque !== 0;}
-  get accountingSort(){return this.state.accounting.sort((a1, a2) => a1.id > a2.id);}
+  get accountingSort(){return this.state.accounting.sortById();}
 
   updateExpense(expense) {
     const accounting = this.state.accounting;
