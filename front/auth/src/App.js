@@ -14,7 +14,7 @@ const getClientApplication = () => {
   const client = new UserAgentApplication(applicationConfig.clientID, applicationConfig.authority,
     (errorDesc, token, error, tokenType) => {
       // Called after loginRedirect or acquireTokenPopup
-      if (tokenType == "id_token") {
+      if (tokenType === "id_token") {
         var userName = client.getUser().name;
         console.log("User '" + userName + "' logged-in");
       } else {
@@ -24,57 +24,30 @@ const getClientApplication = () => {
   return client;
 }
 
-const loginPopup = () => {
+const loginPopup = (redirectUrl) => {
   const clientApplication = getClientApplication();
   clientApplication.loginPopup(applicationConfig.graphScopes).then((idToken) => {
     clientApplication.acquireTokenSilent(applicationConfig.graphScopes).then((accessToken) => {
       var userName = clientApplication.getUser().name;
-      this.setState({ isLoggedIn: true });
-      this.logMessage("User '" + userName + "' logged-in");
+      console.log("UserIci '" + userName + "' logged-in");
+      window.location.href = redirectUrl;
     }, (error) => {
       clientApplication.acquireTokenPopup(applicationConfig.graphScopes).then((accessToken) => {
         var userName = clientApplication.getUser().name;
-        this.setState({ isLoggedIn: true });
-        this.logMessage("User '" + userName + "' logged-in");
+        console.log("Userla '" + userName + "' logged-in");
+        window.location.href = redirectUrl;
       }, (error) => {
-        this.logMessage("Error acquiring the popup:\n" + error);
+        console.log("Error acquiring the popup:\n" + error);
       });
     })
   }, (error) => {
-    this.logMessage("Error during login:\n" + error);
+    console.log("Error during login:\n" + error);
   });
 }
 
-class App extends Component {
-  constructor(props){
-    super(props);
-
-    this.state = {
-      isLoggedIn: false,
-    }
-  }
-
-  render() {
-    //loginPopup();
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+const App = (props) => {
+  loginPopup(props.conf.entrypointUrl);
+  return (<p>Authentification en cours</p>);
 }
 
 export default App;
