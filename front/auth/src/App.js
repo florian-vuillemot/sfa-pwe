@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { UserAgentApplication } from 'msalx';
 
 const applicationConfig = {
-  clientID: "bdbb9295-8743-4764-9a04-5e71754d3622",
-  authority: "https://login.microsoftonline.com/common",
+  clientID: "b0120a5f-9471-4688-a7ac-22a400db0064",
+  authority: "https://login.microsoftonline.com/704dcc90-17c4-4ad2-9380-cab8624ac13f",
   graphScopes: ["user.read"],
   graphEndpoint: "https://graph.microsoft.com/v1.0/me"
 }
@@ -29,8 +28,18 @@ const loginPopup = (redirectUrl) => {
   clientApplication.loginPopup(applicationConfig.graphScopes).then((idToken) => {
     clientApplication.acquireTokenSilent(applicationConfig.graphScopes).then((accessToken) => {
       var userName = clientApplication.getUser().name;
-      console.log("UserIci '" + userName + "' logged-in");
-      window.location.href = redirectUrl;
+      console.log(clientApplication);
+      fetch("https://sfa-pwe.azurewebsites.net/api/Hello", {
+        method: "GET",
+        headers: { 'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'application/json' }
+      }).then(response => {
+        response.text().then(text => console.log("Web APi returned:\n" + JSON.stringify(text)));
+      }).catch(result => {
+        console.log("Error calling the Web api:\n" + result);
+      });
+      //window.location.href = "https://sfa-pwe.azurewebsites.net/api/Hello";
+      //window.location.href = redirectUrl + `?token=${accessToken}`;
     }, (error) => {
       clientApplication.acquireTokenPopup(applicationConfig.graphScopes).then((accessToken) => {
         var userName = clientApplication.getUser().name;
