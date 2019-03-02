@@ -1,61 +1,45 @@
 import React, { Component } from 'react';
 import './App.css';
-import { UserAgentApplication } from 'msalx';
+import auth0 from 'auth0-js';
 
-const applicationConfig = {
-  clientID: "b0120a5f-9471-4688-a7ac-22a400db0064",
-  authority: "https://login.microsoftonline.com/704dcc90-17c4-4ad2-9380-cab8624ac13f",
-  graphScopes: ["user.read"],
-  graphEndpoint: "https://graph.microsoft.com/v1.0/me"
-}
-
-const getClientApplication = () => {
-  const client = new UserAgentApplication(applicationConfig.clientID, applicationConfig.authority,
-    (errorDesc, token, error, tokenType) => {
-      // Called after loginRedirect or acquireTokenPopup
-      if (tokenType === "id_token") {
-        var userName = client.getUser().name;
-        console.log("User '" + userName + "' logged-in");
-      } else {
-        console.log("Error during login:\n" + error);
-      }
+class Auth {
+  auth0 = new auth0.WebAuth({
+    domain: 'sfa-pwe.eu.auth0.com',
+    clientID: 'Yb9QQ3hTdnx65ysGgGmjUl6hXfkTxcvx',
+    redirectUri: 'http://localhost:3000',
+    responseType: 'token id_token',
+    scope: 'openid'
   });
-  return client;
+
+  login() {
+    this.auth0.authorize();
+  }
+
+  handleAuthentication() {
+    // Too late for think more about a fucking problem
+    const tokenStr = "access_token";
+    const url_string = window.location.href.replace("/#", "?");
+
+    if (url_string.includes(tokenStr)){
+      const url = new URL(url_string);
+      return url.searchParams.get(tokenStr);
+    }
+    return null;
+  }
 }
 
-const loginPopup = (redirectUrl) => {
-  const clientApplication = getClientApplication();
-  clientApplication.loginPopup(applicationConfig.graphScopes).then((idToken) => {
-    clientApplication.acquireTokenSilent(applicationConfig.graphScopes).then((accessToken) => {
-      var userName = clientApplication.getUser().name;
-      console.log(clientApplication);
-      fetch("https://sfa-pwe.azurewebsites.net/api/Hello", {
-        method: "GET",
-        headers: { 'Authorization': 'Bearer ' + accessToken,
-        'Content-Type': 'application/json' }
-      }).then(response => {
-        response.text().then(text => console.log("Web APi returned:\n" + JSON.stringify(text)));
-      }).catch(result => {
-        console.log("Error calling the Web api:\n" + result);
-      });
-      //window.location.href = "https://sfa-pwe.azurewebsites.net/api/Hello";
-      //window.location.href = redirectUrl + `?token=${accessToken}`;
-    }, (error) => {
-      clientApplication.acquireTokenPopup(applicationConfig.graphScopes).then((accessToken) => {
-        var userName = clientApplication.getUser().name;
-        console.log("Userla '" + userName + "' logged-in");
-        window.location.href = redirectUrl;
-      }, (error) => {
-        console.log("Error acquiring the popup:\n" + error);
-      });
-    })
-  }, (error) => {
-    console.log("Error during login:\n" + error);
-  });
+const auth = new Auth();
+
+const token = auth.handleAuthentication();
+if (token !== null){
+  console.log(token)
 }
+else {
+  auth.login();
+}
+
 
 const App = (props) => {
-  loginPopup(props.conf.entrypointUrl);
   return (<p>Authentification en cours</p>);
 }
 
