@@ -1,46 +1,40 @@
 import React, { Component } from 'react';
+import { Navbar, Button } from 'react-bootstrap';
 import './App.css';
-import auth0 from 'auth0-js';
 
-class Auth {
-  auth0 = new auth0.WebAuth({
-    domain: 'sfa-pwe.eu.auth0.com',
-    clientID: 'Yb9QQ3hTdnx65ysGgGmjUl6hXfkTxcvx',
-    redirectUri: 'http://localhost:3000',
-    responseType: 'token id_token',
-    scope: 'openid'
-  });
+class App extends Component {
+  constructor(props){
+    super(props);
+    this.login();
+  }
+  
+  goTo(route) {
+    this.props.history.replace(`/${route}`)
+  }
 
   login() {
-    this.auth0.authorize();
+    this.props.auth.login();
   }
 
-  handleAuthentication() {
-    // Too late for think more about a fucking problem
-    const tokenStr = "access_token";
-    const url_string = window.location.href.replace("/#", "?");
+  logout() {
+    this.props.auth.logout();
+  }
 
-    if (url_string.includes(tokenStr)){
-      const url = new URL(url_string);
-      return url.searchParams.get(tokenStr);
+  componentDidMount() {
+    const { renewSession } = this.props.auth;
+
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+      renewSession();
     }
-    return null;
   }
-}
 
-const auth = new Auth();
-
-const token = auth.handleAuthentication();
-if (token !== null){
-  console.log(token)
-}
-else {
-  auth.login();
-}
-
-
-const App = (props) => {
-  return (<p>Authentification en cours</p>);
+  render() {
+    return (
+      <div>
+        Authentification en cours...
+      </div>
+    );
+  }
 }
 
 export default App;
