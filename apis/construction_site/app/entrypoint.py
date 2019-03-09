@@ -7,7 +7,6 @@ def hello():
 
 @app.route("/constructions-site")
 def constructions_site():
-    db_connector
     return "All constructions site"
 
 @app.route("/construction-site", methods=['POST'])
