@@ -1,5 +1,7 @@
+from typing import List, Dict
+
 class ConstructionSite:
-    def __init__(self, id: int, year: int, month: int, working_days, construction_site_data):
+    def __init__(self, id: int, year: int, month: int, working_days: List[Dict], construction_site_data: Dict, **kwargs):
         self._id = id
         self._year = year
         self._month = month

@@ -1,5 +1,5 @@
 import sys
-import pymongo
+from pymongo import MongoClient
 
 class DBConnector:
     def __init__(self, url, port, database, collection):
@@ -11,8 +11,8 @@ class DBConnector:
         self._db_connection = None
 
     def __enter__(self):
-        self._client = MongoClient(self.url, self.port)
-        self._db_connection = self._client[self.database]
+        self._client = MongoClient(self._url, self._port)
+        self._db_connection = self._client[self._database]
         return self._db_connection[self._collection]
 
     def __exit__(self, type, value, traceback):
