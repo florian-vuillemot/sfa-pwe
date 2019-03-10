@@ -25,7 +25,7 @@ class ORM:
     def update(self, query: Union[int, Dict], element: Dict[str, Any]):
         if isinstance(query, int):
             query = {'id': query}
-        self._db_connector.replace_one(query, element)   
+        self._db_connector.replace_one(query, element, True)   
         return self.get(query)
 
 def _clean_object_id(cs):
