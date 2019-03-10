@@ -1,0 +1,22 @@
+{
+    "id": 4, 
+    "year": 2018,
+    "month": 3,
+    "working_days": [{
+        "id": 1,
+        "date": "2019-03-03",
+        "type": "Transfert",
+        "tax_free_price": 3.2,
+        "price": 2.3,
+        "hours": 2
+    }],
+    "construction_site_data": {
+        "client": "eurovia",
+        "place": "Mtn",
+        "rate": {
+            "hour_tax_free_price": 32.3,
+            "day_tax_free_price": 3.1,
+            "tax_percent": 10
+            }
+    }
+}
