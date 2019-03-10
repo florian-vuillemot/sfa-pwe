@@ -3,7 +3,7 @@ from bson.json_util import dumps
 from db_connector import DBConnector
 from typing import Dict, Any, Union
 
-class BackEnd:
+class ORM:
     def __init__(self, cls, db_connector: DBConnector):
         self._cls = cls
         self._db_connector = db_connector
