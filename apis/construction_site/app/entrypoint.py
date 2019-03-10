@@ -1,8 +1,19 @@
 from flask import Flask, request
 app = Flask(__name__)
 
+import os
+import configparser
+config = configparser.ConfigParser()
+config.read('.config')
+env = os.environ.get('ENV', 'dev')
+
 from db_connector import DBConnector
-db_connector = DBConnector("localhost", 27017, "test", "construction_site")
+db_connector = DBConnector(
+    config[env]['url'],
+    int(config[env]['port']),
+    config[env]['database'],
+    config[env]['collection']
+)
 
 from orm import ORM
 
