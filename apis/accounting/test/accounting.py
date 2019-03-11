@@ -13,8 +13,10 @@ class AccountingTest(unittest.TestCase):
     }
 
     def test_to_dict(self):
-        c = Accounting(**self.accounting)
-        self.assertEqual(c.to_dict(), self.accounting)
+        c = Accounting(**self.accounting).to_dict()
+        del c['year']
+        del c['month']
+        self.assertEqual(c, self.accounting)
 
 if __name__ == '__main__':
     unittest.main()

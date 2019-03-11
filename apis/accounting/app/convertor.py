@@ -24,5 +24,8 @@ def convert_for_accounting(data: Dict[str, Any]):
     return _convert(data, False)
 
 def from_accounting(data: Dict[str, Any]):
-    return _convert(data, True)
+    res = _convert(data, True)
+    del res['year']
+    del res['month']
+    return res
 

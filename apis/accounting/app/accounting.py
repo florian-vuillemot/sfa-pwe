@@ -1,21 +1,28 @@
+from datetime import datetime
 from typing import Dict, Any, Union
+
+DATE_FORMAT = '%Y-%m-%d'
 
 class Accounting:
     def __init__(self, id: int, date: str, price: Dict[str, Union[int, float]],
                 payment: Dict[str, Union[str, str]], info: Dict[str, str], **kwargs):
         self._id = id
-        self._date = date
+        self._date = datetime.strptime(date, DATE_FORMAT)
         self._price = Price(**price)
         self._payment = Payment(**payment)
         self._info = Info(**info)
+        self._year = self._date.year
+        self._month = self._date.month
 
     def to_dict(self):
         return {
             'id': self._id,
-            'date': self._date,
+            'date': self._date.strftime(DATE_FORMAT),
             'price': self._price.to_dict(),
             'payment': self._payment.to_dict(),
-            'info': self._info.to_dict()
+            'info': self._info.to_dict(),
+            'year': self._year,
+            'month': self._month
         }
 
 class Price:

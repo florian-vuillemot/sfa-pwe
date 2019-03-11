@@ -56,7 +56,7 @@ class AppTest(unittest.TestCase):
         with app.test_client() as c:
             c.post('/accounting', json=accounting)
             cs = copy.deepcopy(accounting)
-            cs['date'] += "2.0"
+            cs['price']['price'] += 1
             resp = c.put(f'/accounting/%d' % cs['id'], json=cs)
             r = json.loads(resp.data)
             self.assertEqual(r, cs)
@@ -66,6 +66,20 @@ class AppTest(unittest.TestCase):
             resp = c.put(f'/accounting/%s' % accounting['id'], json=accounting)
             r = json.loads(resp.data)
             self.assertEqual(r, accounting)
+
+    def test_get_from_date(self):
+        with app.test_client() as c:
+            c.post('/accounting', json=accounting)
+            resp = c.get('/accounting/2019/03')
+            r = json.loads(resp.data)
+            self.assertEqual(r, [accounting])
+
+    def test_bad_get_from_date_(self):
+        with app.test_client() as c:
+            c.post('/accounting', json=accounting)
+            resp = c.get('/accounting/2019/04')
+            r = json.loads(resp.data)
+            self.assertEqual(r, [])
 
 def clean_db():
     import configparser

@@ -2,6 +2,7 @@ from flask import Flask, request
 app = Flask(__name__)
 
 import os
+import json
 import configparser
 config = configparser.ConfigParser()
 config.read('.config')
@@ -28,7 +29,6 @@ def get_orm(func):
     return wrap_get_orm
 
 def to_json(func):
-    import json
     def wrap_to_json(*args, **kwargs):
         r = func(*args, **kwargs)
         if isinstance(r, list):
@@ -63,6 +63,16 @@ def accounting(orm, id: str=None):
         return orm.get(_id).to_dict()
     update_cs = _get_accounting_from_request()
     return orm.update(_id, update_cs.to_dict()).to_dict()
+
+@app.route('/accounting/<year>/<month>', methods=['GET'], endpoint='get_accounting')
+@get_orm
+@to_json
+def get_accounting(orm, year: str, month: str):
+    from datetime import datetime
+    from calendar import monthrange
+    _year, _month = int(year), int(month)
+    query = {'year': _year, 'month': _month}
+    return list(map(lambda cs: cs.to_dict(), orm.all(query)))
 
 def _get_accounting_from_request():
     data = convert_for_accounting(request.get_json())
