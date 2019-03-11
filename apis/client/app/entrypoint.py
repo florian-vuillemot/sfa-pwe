@@ -2,6 +2,7 @@ from flask import Flask, request
 app = Flask(__name__)
 
 import os
+import json
 import configparser
 config = configparser.ConfigParser()
 config.read('.config')
@@ -28,7 +29,6 @@ def get_orm(func):
     return wrap_get_orm
 
 def to_json(func):
-    import json
     def wrap_to_json(*args, **kwargs):
         r = func(*args, **kwargs)
         if isinstance(r, list):

@@ -8,8 +8,8 @@ class ORM:
         self._cls = cls
         self._db_connector = db_connector
     
-    def all(self):
-        elements = self._db_connector.find({})
+    def all(self, query={}):
+        elements = self._db_connector.find(query)
         return map(lambda e: self._cls(**_clean_object_id(e)), elements)
 
     def create(self, element: Dict[str, Any]):
