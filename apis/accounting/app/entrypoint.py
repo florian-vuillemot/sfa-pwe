@@ -18,6 +18,7 @@ db_connector = DBConnector(
 from orm import ORM
 
 from accounting import Accounting
+from convertor import convert_for_accounting, from_accounting
 
 def get_orm(func):
     def wrap_get_orm(*args, **kwargs):
@@ -29,7 +30,12 @@ def get_orm(func):
 def to_json(func):
     import json
     def wrap_to_json(*args, **kwargs):
-        return json.dumps(func(*args, **kwargs))
+        r = func(*args, **kwargs)
+        if isinstance(r, list):
+            r = [from_accounting(i) for i in r]
+        else:
+            r = from_accounting(r)
+        return json.dumps(r)
     return wrap_to_json
 
 @app.route('/')
@@ -59,7 +65,7 @@ def accounting(orm, id: str=None):
     return orm.update(_id, update_cs.to_dict()).to_dict()
 
 def _get_accounting_from_request():
-    data = request.get_json()
+    data = convert_for_accounting(request.get_json())
     return Accounting(**data)
 
 if __name__ == '__main__':

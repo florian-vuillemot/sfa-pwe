@@ -12,9 +12,9 @@ from app.entrypoint import app
 accounting = {
     'id': 1,
     'date': '2019-03-02',
-    'price': {'price': 120.00, 'tax_percent': 20, 'tax_free_price': 100},
-    'payment': {'method': 'CHEQUE', 'cheque_number': '323'},
-    'info': {'description': 'libelle', 'invoice_number': 'FDS23'}
+    'price': {'price': 120.00, 'taxPercent': 20, 'taxFreePrice': 100},
+    'payment': {'method': 'CHEQUE', 'chequeNumber': '323'},
+    'info': {'description': 'libelle', 'invoiceNumber': 'FDS23'}
 }
 
 class AppTest(unittest.TestCase):
