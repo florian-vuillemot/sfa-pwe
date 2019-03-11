@@ -8,12 +8,12 @@ fields = [
     ])
 ]
 
-def _convert(data, from_accounting):
+def _convert(data, from_client):
     _data = deepcopy(data)
     for field, li in fields:
         d = _data[field]
         for f1, f2 in li:
-            new_field, to_change = (f1, f2) if from_accounting else (f2, f1)
+            new_field, to_change = (f1, f2) if from_client else (f2, f1)
             d[new_field] = d[to_change]
             del d[to_change]
     return _data

@@ -10,7 +10,7 @@ fields = [
     ('working_days', [('taxFreePrice', 'tax_free_price')])
 ]
 
-def _convert(data, from_accounting):
+def _convert(data, from_cs):
     for field, li in fields:
         d = data[field]
         if isinstance(li, tuple):
@@ -18,7 +18,7 @@ def _convert(data, from_accounting):
             d = data[field][new_field]
             li = new_li
         for f1, f2 in li:
-            new_field, to_change = (f1, f2) if from_accounting else (f2, f1)
+            new_field, to_change = (f1, f2) if from_cs else (f2, f1)
             if isinstance(d, list):
                 for _d in d:
                     _d[new_field] = _d[to_change]
