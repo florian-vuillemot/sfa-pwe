@@ -13,21 +13,21 @@ construction_site = {
     "id": 1, 
     "year": 2019,
     "month": 3,
-    "working_days": [{
+    "workingDays": [{
         "id": 1,
         "date": "2019-03-03",
         "type": "Transfert",
-        "tax_free_price": 3.2,
+        "taxFreePrice": 3.2,
         "price": 2.3,
         "hours": 2
     }],
-    "construction_site_data": {
+    "constructionSiteData": {
         "client": "eurovia",
         "place": "Mtn",
         "rate": {
-            "hour_tax_free_price": 32.3,
-            "day_tax_free_price": 3.1,
-            "tax_percent": 10
+            "hourTaxFreePrice": 32.3,
+            "dayTaxFreePrice": 3.1,
+            "taxPercent": 10
             }
     }
 }

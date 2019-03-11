@@ -15,8 +15,8 @@ client = {
         "number": "42",
         "street": "Rue du",
         "city": "Paris",
-        "postal_code": "34",
-        "additional_details": None
+        "postalCode": "34",
+        "additionalDetails": None
     }
 }
 
