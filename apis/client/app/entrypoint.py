@@ -43,20 +43,18 @@ def clients(orm):
     return list(map(lambda cs: cs.to_dict(), orm.all()))
 
 @app.route('/client', methods=['POST'])
-@app.route('/client/<id>', methods=['GET', 'PUT'])
+@app.route('/client/<name>', methods=['GET', 'PUT'])
 @to_json
 @get_orm
-def client(orm, id: str=None):
+def client(orm, name: str=None):
     if request.method == 'POST':
         new_cs = _get_client_from_request()
         return orm.create(new_cs.to_dict()).to_dict()
-    if not id or not id.isdigit():
-        return {}
-    _id = int(id)
+    query = {'name': name}
     if request.method == 'GET':
-        return orm.get(_id).to_dict()
+        return orm.get(query).to_dict()
     update_cs = _get_client_from_request()
-    return orm.update(_id, update_cs.to_dict()).to_dict()
+    return orm.update(query, update_cs.to_dict()).to_dict()
 
 def _get_client_from_request():
     data = request.get_json()
