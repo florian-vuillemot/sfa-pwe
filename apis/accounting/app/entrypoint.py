@@ -64,7 +64,7 @@ def accounting(orm, id: str=None):
     update_cs = _get_accounting_from_request()
     return orm.update(_id, update_cs.to_dict()).to_dict()
 
-@app.route('/accounting/<year>/<month>', methods=['GET'], endpoint='get_accounting')
+@app.route('/accountings/<year>/<month>', methods=['GET'], endpoint='get_accounting')
 @get_orm
 @to_json
 def get_accounting(orm, year: str, month: str):

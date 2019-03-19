@@ -70,14 +70,14 @@ class AppTest(unittest.TestCase):
     def test_get_from_date(self):
         with app.test_client() as c:
             c.post('/accounting', json=accounting)
-            resp = c.get('/accounting/2019/03')
+            resp = c.get('/accountings/2019/03')
             r = json.loads(resp.data)
             self.assertEqual(r, [accounting])
 
     def test_bad_get_from_date_(self):
         with app.test_client() as c:
             c.post('/accounting', json=accounting)
-            resp = c.get('/accounting/2019/04')
+            resp = c.get('/accountings/2019/04')
             r = json.loads(resp.data)
             self.assertEqual(r, [])
 
