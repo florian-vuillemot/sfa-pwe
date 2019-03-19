@@ -82,6 +82,20 @@ class AppTest(unittest.TestCase):
             r = json.loads(resp.data)
             self.assertEqual(r, construction_site)
 
+    def test_get_from_date(self):
+        with app.test_client() as c:
+            c.post('/construction-site', json=construction_site)
+            resp = c.get('/constructions_site/2019/03')
+            r = json.loads(resp.data)
+            self.assertEqual(r, [construction_site])
+
+    def test_bad_get_from_date_(self):
+        with app.test_client() as c:
+            c.post('/construction-site', json=construction_site)
+            resp = c.get('/constructions_site/2019/04')
+            r = json.loads(resp.data)
+            self.assertEqual(r, [])
+
 def clean_db():
     import configparser
     config = configparser.ConfigParser()

@@ -64,6 +64,17 @@ def construction_site(orm, id: str=None):
     update_cs = _get_construction_site_from_request()
     return orm.update(_id, update_cs.to_dict()).to_dict()
 
+
+@app.route('/constructions_site/<year>/<month>', methods=['GET'], endpoint='get_accounting')
+@get_orm
+@to_json
+def get_construction_site(orm, year: str, month: str):
+    from datetime import datetime
+    from calendar import monthrange
+    _year, _month = int(year), int(month)
+    query = {'year': _year, 'month': _month}
+    return list(map(lambda cs: cs.to_dict(), orm.all(query)))
+
 def _get_construction_site_from_request():
     data = convert_for_construction_site(request.get_json())
     return ConstructionSite(**data)
