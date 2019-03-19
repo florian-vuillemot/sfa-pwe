@@ -1,13 +1,46 @@
 version: '2'
 services:
-    mongodb:
-        image: mongo:latest
-        container_name: "mongodb"
-        environment:
-          - MONGO_DATA_DIR=/data/db
-          - MONGO_LOG_DIR=/dev/null
-        volumes:
-          - ./data/db:/data/db
-        ports:
-            - 27017:27017
-        command: mongod --smallfiles --logpath=/dev/null # --quiet
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+        - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+  accounting:
+    container_name: "accounting"
+    build:
+      context: ./accounting/app/
+      dockerfile: ./Dockerfile
+    image: accounting
+    ports:
+      - 8080:5000
+    restart: always
+    links:
+      - mongodb:db
+  construction-site:
+    container_name: "construction-site"
+    build:
+      context: ./construction_site/app/
+      dockerfile: ./Dockerfile
+    image: construction_site
+    ports:
+      - 8081:5000
+    restart: always
+    links:
+      - mongodb:db
+  client:
+    container_name: "client"
+    build:
+      context: ./client/app/
+      dockerfile: ./Dockerfile
+    image: client
+    ports:
+      - 8082:5000
+    restart: always
+    links:
+      - mongodb:db
